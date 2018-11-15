@@ -4,23 +4,21 @@ This repo contains the main Terraform config for MIT Libraries. Make sure to rea
 
 ## Workspaces
 
-We maintain both `production` and `staging` copies of most resources. If you have not configured a specific workspace Terraform will use the `default` workspace. Your workspace can be configured by setting the `TF_WORKSPACE` environment variable, or explicitly switching workspaces with the `terraform workspace select` command.
+We maintain both `prod` and `stage` copies of most resources. If you have not configured a specific workspace Terraform will use the `default` workspace. Your workspace can be configured by setting the `TF_WORKSPACE` environment variable, or explicitly switching workspaces with the `terraform workspace select` command.
 
 [ADR-2](docs/adrs/0002-use-terraform-workspaces-for-environments.md) provides the rationale for using workspaces.
 
 ## Layout
 
-```
-apps/
-  |- app1/
-  |- app2/
-global/
-  |- global1/
-  |- global2/
-shared/
-  |- shared1/
-  |- shared2/
-```
+    apps/
+      |- app1/
+      |- app2/
+    global/
+      |- global1/
+      |- global2/
+    shared/
+      |- shared1/
+      |- shared2/
 
 ### The apps Directory
 
@@ -28,11 +26,11 @@ Each application should have its own remote config (tfstate file) stored in an S
 
 ### The global Directory
 
-A few resources, e.g. Route53, will only use the `production` workspace. These global resources should go here.
+A few resources, e.g. Route53, will only use the `prod` workspace. These global resources should go here.
 
 ### The shared Directory
 
-This directory is for resources that may be shared between apps. These might include things like Elasticsearch, Redis, etc. Unlike the `global` directory these resources should have `production` and `staging` counterparts.
+This directory is for resources that may be shared between apps. These might include things like Elasticsearch, Redis, etc. Unlike the `global` directory these resources should have `prod` and `stage` counterparts.
 
 ## Naming
 
