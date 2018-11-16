@@ -6,5 +6,4 @@ before_install:
   - export PATH=$PATH:$PWD/bin
   - terraform -v
 script:
-  - terraform fmt -check=true
-#  - terraform validate -check-variables=false
+  - make all
