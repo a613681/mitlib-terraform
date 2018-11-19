@@ -17,3 +17,8 @@ output "private_zonename" {
   description = "Route53 Private Zone name"
   value       = "${aws_route53_zone.main_priv.name}"
 }
+
+output "mitlib_cert" {
+  description = "*.mitlib.net wildcard certificate"
+  value       = "${module.acm_request_certificate.arn}"
+}
