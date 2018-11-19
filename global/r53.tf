@@ -17,6 +17,10 @@ resource "aws_route53_zone" "main_priv" {
   vpc {
     vpc_id = "${module.prodvpc.vpc_id}"
   }
+
+  lifecycle {
+    ignore_changes = ["vpc"]
+  }
 }
 
 #Associate Stage VPC with Internal DNS
