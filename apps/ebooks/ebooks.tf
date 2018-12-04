@@ -5,7 +5,7 @@ module "label" {
 
 #create our AWS ebooks user
 resource "aws_iam_user" "default" {
-  name          = "${module.label.name}-${module.ebooks.access}"
+  name          = "${module.label.name}-readwrite"
   path          = "/"
   force_destroy = "false"
 }
@@ -13,13 +13,12 @@ resource "aws_iam_user" "default" {
 module "ebooks" {
   source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
   name               = "ebooks"
-  access             = "readwrite"
   versioning_enabled = "true"
 }
 
 resource "aws_iam_user_policy_attachment" "default_rw" {
   user       = "${aws_iam_user.default.name}"
-  policy_arn = "${module.ebooks.readwrite_arn[0]}"
+  policy_arn = "${module.ebooks.readwrite_arn}"
 }
 
 # Generate API credentials
