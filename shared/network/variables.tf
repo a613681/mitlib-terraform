@@ -1,3 +1,7 @@
+variable "aws_region" {
+  default = "us-east-1"
+}
+
 variable "name" {
   description = "Name to be used on all the resources as identifier"
   default     = ""
@@ -24,4 +28,9 @@ variable "private_subnets" {
   description = "A list of private subnets inside the VPC"
   type        = "list"
   default     = []
+}
+
+variable "alb_cidrs" {
+  description = "MIT's CIDR range. Used to restrict access to on campus/VPN IP's"
+  default     = ["0.0.0.0/0"]
 }
