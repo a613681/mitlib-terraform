@@ -22,3 +22,8 @@ output "mitlib_cert" {
   description = "*.mitlib.net wildcard certificate"
   value       = "${module.acm_request_certificate.arn}"
 }
+
+output "mit_saml_arn" {
+  description = "MIT Identity provider arn (SAML Federated login)"
+  value       = "${aws_iam_saml_provider.mit.arn}"
+}
