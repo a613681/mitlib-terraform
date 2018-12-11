@@ -15,6 +15,11 @@ module "ecr" {
   name   = "carbon"
 }
 
+module "label" {
+  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  name   = "carbon"
+}
+
 data "aws_iam_policy_document" "cloudwatch_policy" {
   statement {
     actions = [
@@ -65,9 +70,10 @@ data "aws_iam_policy_document" "cloudwatch_assume_role" {
  * different than the task role.
  */
 resource "aws_iam_role" "execution_role" {
-  name               = "carbon-${terraform.workspace}-agent"
+  name               = "${module.label.name}-agent"
   assume_role_policy = "${data.aws_iam_policy_document.ecs_task_assume_role.json}"
   description        = "Carbon role used for running container"
+  tags               = "${module.label.tags}"
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_login_attach" {
@@ -91,9 +97,10 @@ resource "aws_iam_role_policy" "cloudwatch_attach" {
  * resources.
  */
 resource "aws_iam_role" "task_role" {
-  name               = "carbon-${terraform.workspace}-task"
+  name               = "${module.label.name}-task"
   assume_role_policy = "${data.aws_iam_policy_document.ecs_task_assume_role.json}"
   description        = "Carbon role used by app running in container"
+  tags               = "${module.label.tags}"
 }
 
 resource "aws_iam_role_policy_attachment" "secret_attach" {
@@ -106,9 +113,10 @@ resource "aws_iam_role_policy_attachment" "secret_attach" {
  * able to run the ECS task.
  */
 resource "aws_iam_role" "cloudwatch_task_role" {
-  name               = "carbon-${terraform.workspace}-cloudwatch-task"
+  name               = "${module.label.name}-cloudwatch-task"
   assume_role_policy = "${data.aws_iam_policy_document.cloudwatch_assume_role.json}"
   description        = "Carbon role used for running Fargate task"
+  tags               = "${module.label.tags}"
 }
 
 resource "aws_iam_role_policy" "ecs_run_attach" {
@@ -117,20 +125,20 @@ resource "aws_iam_role_policy" "ecs_run_attach" {
 }
 
 resource "aws_ecs_cluster" "default" {
-  name = "carbon-${terraform.workspace}-cluster"
+  name = "${module.label.name}-cluster"
+  tags = "${module.label.tags}"
 }
 
 resource "aws_cloudwatch_log_group" "default" {
-  name = "carbon-${terraform.workspace}-logs"
+  name              = "${module.label.name}-logs"
+  retention_in_days = 30
 }
 
 resource "aws_security_group" "default" {
-  name        = "carbon-${terraform.workspace}-sg"
+  name        = "${module.label.name}-sg"
   description = "Allow all outband traffic"
 
-  tags {
-    Name = "carbon-${terraform.workspace}-sg"
-  }
+  tags = "${module.label.tags}"
 
   egress {
     from_port   = 0
@@ -157,7 +165,7 @@ data "template_file" "task_template" {
 
 resource "aws_ecs_task_definition" "ecs_task" {
   count                    = "${length(local.feed_types)}"
-  family                   = "carbon-${terraform.workspace}-${lookup(local.feed_types, count.index)}"
+  family                   = "${module.label.name}-${lookup(local.feed_types, count.index)}"
   container_definitions    = "${data.template_file.task_template.*.rendered[count.index]}"
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = "${aws_iam_role.task_role.arn}"
@@ -169,7 +177,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
 
 resource "aws_cloudwatch_event_rule" "default" {
   count               = "${length(local.feed_types)}"
-  name                = "carbon-${terraform.workspace}-${lookup(local.feed_types, count.index)}"
+  name                = "${module.label.name}-${lookup(local.feed_types, count.index)}"
   schedule_expression = "${lookup(var.schedule, lookup(local.feed_types, count.index))}"
   is_enabled          = false
 }
@@ -189,5 +197,17 @@ resource "aws_cloudwatch_event_target" "default" {
       subnets         = ["${data.aws_subnet.mit_net.id}"]
       security_groups = ["${aws_security_group.default.id}"]
     }
+  }
+}
+
+/**
+ * Create SNS topic for notifications (Terraform can't create e-mail topics
+ * since they require user verification via an e-mail)
+ */
+resource "aws_sns_topic" "instance-alerts" {
+  name = "${module.label.name}"
+
+  provisioner "local-exec" {
+    command = "aws sns subscribe --topic-arn ${self.arn} --protocol email --notification-endpoint ${var.email}"
   }
 }
