@@ -1,0 +1,22 @@
+[
+  {
+    "name": "carbon",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "carbon"
+      }
+    },
+    "command": [
+      "--ftp",
+      "--ftp-host", "${ftp_host}",
+      "--ftp-user", "${ftp_user}",
+      "--ftp-path", "${ftp_path}",
+      "--secret-id", "${secret_id}",
+      "${feed_type}"
+    ]
+  }
+]
