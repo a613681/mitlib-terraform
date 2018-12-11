@@ -17,3 +17,8 @@ variable schedule {
   type        = "map"
   description = "A map with the cron schedule expression keyed to the feed type (articles, people)"
 }
+
+variable email {
+  type        = "string"
+  description = "An E-mail address to send the SNS notifications to"
+}
