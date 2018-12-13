@@ -64,6 +64,13 @@ data "aws_iam_policy_document" "cloudwatch_assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "sns_publish" {
+  statement {
+    actions   = ["sns:Publish"]
+    resources = ["${aws_sns_topic.instance-alerts.arn}"]
+  }
+}
+
 /**
  * The execution role is used for the agent running the container. It needs
  * to be able to pull from ECR and write logs to Cloudwatch. This is
@@ -106,6 +113,11 @@ resource "aws_iam_role" "task_role" {
 resource "aws_iam_role_policy_attachment" "secret_attach" {
   role       = "${aws_iam_role.task_role.name}"
   policy_arn = "${module.secret.read_policy}"
+}
+
+resource "aws_iam_role_policy" "sns_attach" {
+  role   = "${aws_iam_role.task_role.name}"
+  policy = "${data.aws_iam_policy_document.sns_publish.json}"
 }
 
 /**
