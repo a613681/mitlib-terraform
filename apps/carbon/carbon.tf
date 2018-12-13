@@ -158,6 +158,7 @@ data "template_file" "task_template" {
     ftp_user  = "${var.ftp_user}"
     ftp_path  = "${lookup(var.ftp_path, lookup(local.feed_types, count.index))}"
     secret_id = "${module.secret.secret}"
+    sns_topic = "${aws_sns_topic.instance-alerts.arn}"
     feed_type = "${lookup(local.feed_types, count.index)}"
     log_group = "${aws_cloudwatch_log_group.default.name}"
   }

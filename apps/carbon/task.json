@@ -16,6 +16,7 @@
       "--ftp-user", "${ftp_user}",
       "--ftp-path", "${ftp_path}",
       "--secret-id", "${secret_id}",
+      "--sns-topic", "${sns_topic}",
       "${feed_type}"
     ]
   }
