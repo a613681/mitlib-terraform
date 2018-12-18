@@ -94,6 +94,7 @@ resource "aws_iam_role_policy_attachment" "ecs_read_attach" {
 }
 
 resource "aws_iam_role_policy" "cloudwatch_attach" {
+  name   = "${module.label.name}-cloudwatch"
   role   = "${aws_iam_role.execution_role.name}"
   policy = "${data.aws_iam_policy_document.cloudwatch_policy.json}"
 }
@@ -116,6 +117,7 @@ resource "aws_iam_role_policy_attachment" "secret_attach" {
 }
 
 resource "aws_iam_role_policy" "sns_attach" {
+  name   = "${module.label.name}-sns"
   role   = "${aws_iam_role.task_role.name}"
   policy = "${data.aws_iam_policy_document.sns_publish.json}"
 }
@@ -132,6 +134,7 @@ resource "aws_iam_role" "cloudwatch_task_role" {
 }
 
 resource "aws_iam_role_policy" "ecs_run_attach" {
+  name   = "${module.label.name}-ecs-run"
   role   = "${aws_iam_role.cloudwatch_task_role.name}"
   policy = "${data.aws_iam_policy_document.cloudwatch_run_task_policy.json}"
 }
