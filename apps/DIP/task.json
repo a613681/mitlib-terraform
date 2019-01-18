@@ -1,0 +1,14 @@
+[
+  {
+    "name": "dip",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "carbon"
+      }
+    }
+  }
+]
