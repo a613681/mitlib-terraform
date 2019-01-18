@@ -1,11 +1,11 @@
 module "label" {
   source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
-  name   = "DIP-aleph-S3"
+  name   = "dip-aleph-S3"
 }
 
 module "alephs3" {
   source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
-  name               = "DIP-aleph-S3"
+  name               = "dip-aleph-S3"
   versioning_enabled = "true"
 }
 
@@ -47,14 +47,19 @@ data "aws_iam_policy_document" "write" {
   }
 }
 
+module "es-label" {
+  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  name   = "dip-es-indexes"
+}
+
 resource "aws_iam_policy" "es_read" {
-  name        = "dip-esindexes-read"
+  name        = "${module.es-label.name}-read"
   description = "Policy to allow IAM user read only access to DIP ES indexes"
   policy      = "${data.aws_iam_policy_document.read.json}"
 }
 
 resource "aws_iam_policy" "es_write" {
-  name        = "dip-esindexes-write"
+  name        = "${module.es-label.name}-write"
   description = "Policy to allow IAM user write access to DIP ES indexes"
   policy      = "${data.aws_iam_policy_document.write.json}"
 }
