@@ -63,3 +63,25 @@ resource "aws_iam_policy" "es_write" {
   description = "Policy to allow IAM user write access to DIP ES indexes"
   policy      = "${data.aws_iam_policy_document.write.json}"
 }
+
+# Create API Credentials for Timdex (Heroku App) to read from Aleph index
+module "timdex-es-label" {
+  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  name   = "timdex-es"
+}
+
+resource "aws_iam_user" "timdex" {
+  name          = "${module.timdex-es-label.name}-read"
+  path          = "/"
+  force_destroy = "false"
+}
+
+resource "aws_iam_user_policy_attachment" "timdex_es_ro" {
+  user       = "${aws_iam_user.timdex.name}"
+  policy_arn = "${aws_iam_policy.es_read.arn}"
+}
+
+# Generate API credentials
+resource "aws_iam_access_key" "timdex" {
+  user = "${aws_iam_user.timdex.name}"
+}
