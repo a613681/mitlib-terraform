@@ -14,6 +14,7 @@ resource "aws_iam_user" "default" {
   name          = "${module.label.name}-readwrite"
   path          = "/"
   force_destroy = "false"
+  tags          = "${module.label.tags}"
 }
 
 resource "aws_iam_user_policy_attachment" "default_rw" {
@@ -26,7 +27,7 @@ resource "aws_iam_access_key" "default" {
   user = "${aws_iam_user.default.name}"
 }
 
-# Create policcies to access the elasticsearch instance
+# Create policies to access the elasticsearch instance
 data "aws_iam_policy_document" "read" {
   statement {
     actions = ["es:ESHttpGet"]
@@ -74,6 +75,7 @@ resource "aws_iam_user" "timdex" {
   name          = "${module.timdex-es-label.name}-read"
   path          = "/"
   force_destroy = "false"
+  tags          = "${module.timdex-es-label.tags}"
 }
 
 resource "aws_iam_user_policy_attachment" "timdex_es_ro" {
