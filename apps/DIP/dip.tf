@@ -27,23 +27,14 @@ resource "aws_iam_access_key" "default" {
   user = "${aws_iam_user.default.name}"
 }
 
-# Create policies to access the elasticsearch instance
+# Create more restricted read policy for timdex indices
 data "aws_iam_policy_document" "read" {
   statement {
     actions = ["es:ESHttpGet"]
 
     resources = [
       "${module.shared.es_arn}/aleph*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "write" {
-  statement {
-    actions = ["es:ESHttp*"]
-
-    resources = [
-      "${module.shared.es_arn}/aleph*",
+      "${module.shared.es_arn}/production*",
     ]
   }
 }
@@ -57,12 +48,6 @@ resource "aws_iam_policy" "es_read" {
   name        = "${module.es-label.name}-read"
   description = "Policy to allow IAM user read only access to DIP ES indexes"
   policy      = "${data.aws_iam_policy_document.read.json}"
-}
-
-resource "aws_iam_policy" "es_write" {
-  name        = "${module.es-label.name}-write"
-  description = "Policy to allow IAM user write access to DIP ES indexes"
-  policy      = "${data.aws_iam_policy_document.write.json}"
 }
 
 # Create API Credentials for Timdex (Heroku App) to read from Aleph index
