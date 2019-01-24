@@ -49,7 +49,7 @@ resource "aws_route53_record" "simile-ns" {
   zone_id = "${aws_route53_zone.simile.zone_id}"
   name    = "${aws_route53_zone.simile.name}"
   type    = "NS"
-  ttl     = "300"
+  ttl     = "86400"
 
   records = [
     "${aws_route53_zone.simile.name_servers.0}",
@@ -63,7 +63,7 @@ resource "aws_route53_record" "simile-soa" {
   zone_id = "${aws_route53_zone.simile.id}"
   name    = "${aws_route53_zone.simile.name}"
   type    = "SOA"
-  ttl     = "300"
+  ttl     = "900"
 
   records = [
     "${aws_route53_zone.simile.name_servers.0}. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400",
@@ -117,7 +117,7 @@ resource "aws_route53_record" "dpworkshop-ns" {
   zone_id = "${aws_route53_zone.dpworkshop.zone_id}"
   name    = "${aws_route53_zone.dpworkshop.name}"
   type    = "NS"
-  ttl     = "300"
+  ttl     = "86400"
 
   records = [
     "${aws_route53_zone.dpworkshop.name_servers.0}",
@@ -131,7 +131,7 @@ resource "aws_route53_record" "dpworkshop-soa" {
   zone_id = "${aws_route53_zone.dpworkshop.id}"
   name    = "${aws_route53_zone.dpworkshop.name}"
   type    = "SOA"
-  ttl     = "300"
+  ttl     = "900"
 
   records = [
     "${aws_route53_zone.dpworkshop.name_servers.0}. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400",
