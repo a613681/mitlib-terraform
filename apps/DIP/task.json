@@ -7,7 +7,7 @@
       "options": {
         "awslogs-group": "${log_group}",
         "awslogs-region": "us-east-1",
-        "awslogs-stream-prefix": "carbon"
+        "awslogs-stream-prefix": "mario"
       }
     }
   }
