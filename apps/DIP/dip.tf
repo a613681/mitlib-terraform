@@ -308,7 +308,7 @@ resource "aws_lambda_function" "default" {
       "ECS_SUBNETS"        = "${join(",", module.shared.private_subnets)}"
       "ECS_CLUSTER"        = "${aws_ecs_cluster.default.arn}"
       "ECS_FAMILY"         = "${aws_ecs_task_definition.default.family}"
-      "ES_URL"             = "${module.shared.es_endpoint}"
+      "ES_URL"             = "https://${module.shared.es_endpoint}"
     }
   }
 }
