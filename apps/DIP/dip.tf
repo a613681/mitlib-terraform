@@ -132,10 +132,28 @@ data "aws_iam_policy_document" "mario_lambda_s3" {
   }
 }
 
+data "aws_iam_policy_document" "mario_lambda_func" {
+  statement {
+    actions = [
+      "lambda:UpdateFunctionCode",
+    ]
+
+    resources = [
+      "${aws_lambda_function.default.arn}",
+    ]
+  }
+}
+
 resource "aws_iam_policy" "mario_lambda_s3_policy" {
   name        = "${module.mario-label.name}-lambda-s3"
   description = "Policy to allow deploy user to write to mario lambda s3"
   policy      = "${data.aws_iam_policy_document.mario_lambda_s3.json}"
+}
+
+resource "aws_iam_policy" "mario_lambda_func_policy" {
+  name        = "${module.mario-label.name}-lambda-func"
+  description = "Policy to allow deploy user to update function code"
+  policy      = "${data.aws_iam_policy_document.mario_lambda_func.json}"
 }
 
 resource "aws_iam_user" "mario_deploy" {
@@ -146,6 +164,11 @@ resource "aws_iam_user" "mario_deploy" {
 resource "aws_iam_user_policy_attachment" "mario_lambda_s3_attach" {
   user       = "${aws_iam_user.mario_deploy.name}"
   policy_arn = "${aws_iam_policy.mario_lambda_s3_policy.arn}"
+}
+
+resource "aws_iam_user_policy_attachment" "mario_lambda_func_attach" {
+  user       = "${aws_iam_user.mario_deploy.name}"
+  policy_arn = "${aws_iam_policy.mario_lambda_func_policy.arn}"
 }
 
 resource "aws_iam_user_policy_attachment" "mario_ecr_login_attach" {
