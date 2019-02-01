@@ -195,7 +195,7 @@ resource "aws_cloudwatch_event_rule" "default" {
   count               = "${length(local.feed_types)}"
   name                = "${module.label.name}-${lookup(local.feed_types, count.index)}"
   schedule_expression = "${lookup(var.schedule, lookup(local.feed_types, count.index))}"
-  is_enabled          = false
+  is_enabled          = true
 }
 
 resource "aws_cloudwatch_event_target" "default" {
