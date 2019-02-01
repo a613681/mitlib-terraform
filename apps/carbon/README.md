@@ -3,7 +3,7 @@ and the AA feeds. The tasks are scheduled by Cloudwatch and run on
 Fargate.
 
 # HR Feed
-The dev feed will be run the 1st Monday of every month at 10AM `cron(0 10 ? * 2#1 *)`. The prod feed will be run on the 4th Monday of July `cron(0 10 ? 7 2#4 *)` and the second Monday of January `cron(0 10 ? 1 2#2 *)`.
+The dev feed will be run the 1st Monday of every month at 10AM `cron(0 10 ? * 2#1 *)`. The prod feed will be run on the 2nd Monday of January and July `cron(0 10 ? 1,7 2#2 *)`.
 
 # AA Feed
 The dev feed will be run on the 1st Monday of every month at 10AM `cron(0 10 ? * 2#1 *)`. The prod feed will be run on the 2nd Monday of every month at 10AM `cron(0 10 ? * 2#2 *)`.
