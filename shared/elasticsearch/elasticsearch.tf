@@ -13,3 +13,35 @@ module "elasticsearch" {
     "rest.action.multi.allow_explicit_index" = "true"
   }
 }
+
+##################################################################
+# Create ES policy doc to allow write access from NAT Public IPs #
+# Re-evaluate this when adding indices from other applications   #
+##################################################################
+data "aws_iam_policy_document" "default" {
+  statement {
+    actions = ["es:*"]
+
+    resources = [
+      "${module.elasticsearch.arn}",
+      "${module.elasticsearch.arn}/*",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "IpAddress"
+      variable = "aws:SourceIp"
+
+      values = ["${module.shared.nat_public_ips}"]
+    }
+  }
+}
+
+resource "aws_elasticsearch_domain_policy" "default" {
+  domain_name     = "${module.elasticsearch.domain_name}"
+  access_policies = "${data.aws_iam_policy_document.default.json}"
+}
