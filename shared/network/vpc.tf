@@ -2,7 +2,7 @@
 #It overrides a better naming schema provided by this module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "1.50.0"
+  version = "1.53.0"
 
   name = "${var.name}"
   cidr = "${var.cidr}"
