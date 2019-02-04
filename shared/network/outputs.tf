@@ -1,15 +1,30 @@
+#######################
+##### VPC OUTPUTS #####
+#######################
+
 output "vpc_id" {
-  value = "${module.vpc.vpc_id}"
+  description = "VPC ID"
+  value       = "${module.vpc.vpc_id}"
 }
 
 output "private_subnets" {
-  value = "${module.vpc.private_subnets}"
+  description = "List of VPC private subnets"
+  value       = "${module.vpc.private_subnets}"
 }
 
 output "public_subnets" {
-  value = "${module.vpc.public_subnets}"
+  description = "List of VPC public subnets"
+  value       = "${module.vpc.public_subnets}"
 }
 
+output "nat_public_ips" {
+  description = "List of public Elastic IPs created for AWS NAT Gateway"
+  value       = "${module.vpc.nat_public_ips}"
+}
+
+######################
+#####ALB OUTPUTS #####
+######################
 output "alb_restricted_arn" {
   description = "Restricted ALB arn"
   value       = "${module.alb_restricted.alb_arn}"
