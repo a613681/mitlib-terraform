@@ -4,9 +4,8 @@ module "label" {
 }
 
 module "alephs3" {
-  source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
-  name               = "dip-aleph-S3"
-  versioning_enabled = "true"
+  source = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  name   = "dip-aleph-S3"
 }
 
 # Create our AWS user to access the S3 Bucket
