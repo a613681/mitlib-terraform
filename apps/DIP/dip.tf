@@ -72,6 +72,43 @@ resource "aws_iam_access_key" "timdex" {
   user = "${aws_iam_user.timdex.name}"
 }
 
+##############################
+### ES Domain Write Policy ###
+### Re-evaluate this      ####
+#############################
+
+#####################################################################
+# Create ES domain policy to allow write access from NAT Public IPs #
+# Re-evaluate this when adding indices from other applications    ###
+#####################################################################
+data "aws_iam_policy_document" "default" {
+  statement {
+    actions = ["es:*"]
+
+    resources = [
+      "${module.shared.es_arn}",
+      "${module.shared.es_arn}/*",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "IpAddress"
+      variable = "aws:SourceIp"
+
+      values = ["${module.shared.nat_public_ips}"]
+    }
+  }
+}
+
+resource "aws_elasticsearch_domain_policy" "default" {
+  domain_name     = "${module.shared.es_domain_name}"
+  access_policies = "${data.aws_iam_policy_document.default.json}"
+}
+
 ###################
 ### Mario below ###
 ###################

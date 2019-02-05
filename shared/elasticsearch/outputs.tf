@@ -17,3 +17,8 @@ output "write_policy_arn" {
   description = "Default domain write policy ARN"
   value       = "${module.elasticsearch.write_policy_arn}"
 }
+
+output "domain_name" {
+  description = "Domain name of cluster"
+  value       = "${module.elasticsearch.domain_name}"
+}
