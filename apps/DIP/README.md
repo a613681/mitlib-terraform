@@ -11,14 +11,13 @@ This module contains the configuration for the Discovery Index Pipeline. The mai
 * User for timdex with read permissions on the Elasticsearch index
 * User for deploying mario container and mario-power Lambda function
 
-The Elasticsearch search index is created in the [shared module](https://github.com/MITLibraries/mitlib-terraform/tree/master/shared/elasticsearch).
+The Elasticsearch search cluster is created in the [shared module](https://github.com/MITLibraries/mitlib-terraform/tree/master/shared/elasticsearch).
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| access\_key\_id | The access key ID |
+| access\_key\_id | Access key ID for the Aleph submission to S3 user |
 | mario\_deploy\_access\_key\_id | Access key ID for the mario deploy user |
 | mario\_deploy\_secret\_access\_key | Secret access key for mario deploy user. |
-| secret\_access\_key | The secret access key. This will be written to the state file in plain-text |
-
+| secret\_access\_key | Secret access key for the Aleph submission to S3 user |

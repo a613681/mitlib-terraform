@@ -1,12 +1,12 @@
 output "access_key_id" {
   value       = "${aws_iam_access_key.default.id}"
-  description = "The access key ID"
+  description = "Access key ID for the Aleph submission to S3 user"
 }
 
 output "secret_access_key" {
   value       = "${aws_iam_access_key.default.secret}"
   sensitive   = true
-  description = "The secret access key. This will be written to the state file in plain-text"
+  description = "Secret access key for Aleph submission to S3 user"
 }
 
 output "mario_deploy_access_key_id" {
