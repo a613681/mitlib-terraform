@@ -1,3 +1,7 @@
+########################
+### Aleph to S3 user ###
+########################
+
 module "label" {
   source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
   name   = "dip-aleph-S3"
@@ -27,6 +31,10 @@ resource "aws_iam_user_policy_attachment" "default_rw" {
 resource "aws_iam_access_key" "default" {
   user = "${aws_iam_user.default.name}"
 }
+
+################################
+### Timdex ES read-only user ###
+################################
 
 # Create more restricted read policy for timdex indices
 data "aws_iam_policy_document" "read" {
