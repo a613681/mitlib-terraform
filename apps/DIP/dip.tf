@@ -362,6 +362,11 @@ resource "aws_security_group" "default" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "lambda" {
+  name              = "/aws/lambda/${module.mario-label.name}-lambda"
+  retention_in_days = 30
+}
+
 resource "aws_lambda_function" "default" {
   function_name = "${module.mario-label.name}-lambda"
   s3_bucket     = "${aws_s3_bucket.lambda_s3.id}"
