@@ -64,3 +64,8 @@ output "alb_restricted_https_listener_arn" {
   description = "Restricted ALB HTTPS listener ARN"
   value       = "${module.alb_restricted.https_listener_arn}"
 }
+
+output "alb_restricted_all_ingress_sgid" {
+  description = "Restricted ALB security group ID allowing all ingress traffic from ALB"
+  value       = "${module.all_access_from_alb.this_security_group_id}"
+}
