@@ -1,8 +1,7 @@
 # Create S3 Bucket for storing images and create IAM user
 module "s3store" {
-  source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
-  name               = "cantaloupe-storage"
-  versioning_enabled = "true"
+  source = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  name   = "cantaloupe-storage"
 }
 
 resource "aws_iam_user_policy_attachment" "store_ro" {

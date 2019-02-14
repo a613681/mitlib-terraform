@@ -1,6 +1,6 @@
 # Create task in JSON format for ECS
 module "task" {
-  source           = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition?ref=tags/0.6.0"
+  source           = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition?ref=tags/0.7.0"
   container_name   = "${module.label.name}"
   container_image  = "${module.ecr.registry_url}:latest"
   container_cpu    = "2048"
@@ -22,7 +22,7 @@ module "task" {
   environment = [
     {
       name  = "ENDPOINT_ADMIN_ENABLED"
-      value = "true"
+      value = "${var.endpoint_admin_enabled}"
     },
     {
       name  = "ENDPOINT_ADMIN_SECRET"
@@ -82,7 +82,7 @@ module "task" {
     },
     {
       name  = "PROCESSOR_JP2"
-      value = "KakaduNativeProcessor"
+      value = "OpenJpegProcessor"
     },
     {
       name  = "PROCESSOR_JPG_QUALITY"
