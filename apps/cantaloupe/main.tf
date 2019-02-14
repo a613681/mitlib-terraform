@@ -18,6 +18,5 @@ terraform {
 
 #Get shared Resources
 module "shared" {
-  source    = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
-  workspace = "stage"
+  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
 }
