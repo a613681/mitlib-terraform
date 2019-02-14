@@ -3,6 +3,10 @@ module "label" {
   name   = "author-lookup"
 }
 
+module "shared" {
+  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
+}
+
 module "bucket" {
   source = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
   name   = "author-lookup"
@@ -165,6 +169,11 @@ resource "aws_iam_user" "default" {
 resource "aws_iam_user_policy_attachment" "default" {
   user       = "${aws_iam_user.default.name}"
   policy_arn = "${module.bucket.readwrite_arn}"
+}
+
+resource "aws_iam_user_policy_attachment" "deploy" {
+  user       = "${aws_iam_user.default.name}"
+  policy_arn = "${module.shared.deploy_rw_arn}"
 }
 
 resource "aws_iam_access_key" "default" {
