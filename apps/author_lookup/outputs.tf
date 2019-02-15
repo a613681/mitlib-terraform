@@ -16,6 +16,7 @@ output "access_key_id" {
 output "secret_access_key" {
   value       = "${aws_iam_access_key.default.secret}"
   description = "Secret key for deploy user"
+  sensitive   = true
 }
 
 output "role_arn" {

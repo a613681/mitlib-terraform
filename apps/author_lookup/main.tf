@@ -26,3 +26,7 @@ terraform {
     encrypt        = true
   }
 }
+
+module "shared" {
+  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
+}

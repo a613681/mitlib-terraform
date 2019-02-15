@@ -3,10 +3,6 @@ module "label" {
   name   = "author-lookup"
 }
 
-module "shared" {
-  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
-}
-
 module "bucket" {
   source = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
   name   = "author-lookup"
