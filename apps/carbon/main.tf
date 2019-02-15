@@ -28,3 +28,7 @@ data "aws_subnet" "mit_net" {
 data "aws_vpc" "mit_net_vpc" {
   id = "vpc-0ef9d327814ed449d"
 }
+
+module "shared" {
+  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
+}
