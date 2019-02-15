@@ -227,3 +227,26 @@ resource "aws_sns_topic" "instance-alerts" {
     command = "aws sns subscribe --topic-arn ${self.arn} --protocol email --notification-endpoint ${var.email}"
   }
 }
+
+###################
+### Deploy user ###
+###################
+
+resource "aws_iam_user" "deploy" {
+  name = "${module.label.name}-deploy"
+  tags = "${module.label.tags}"
+}
+
+resource "aws_iam_user_policy_attachment" "deploy_s3" {
+  user       = "${aws_iam_user.deploy.name}"
+  policy_arn = "${module.shared.deploy_rw_arn}"
+}
+
+resource "aws_iam_user_policy_attachment" "deploy_ecr" {
+  user       = "${aws_iam_user.deploy.name}"
+  policy_arn = "${module.ecr.policy_readwrite_arn}"
+}
+
+resource "aws_iam_access_key" "deploy" {
+  user = "${aws_iam_user.deploy.name}"
+}
