@@ -16,9 +16,6 @@ terraform {
   }
 }
 
-# Call our shared module with "stage workspace" otherwise we receive errors
-# about alb outputs since there is only an ALB in stage currently
 module "shared" {
-  source    = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
-  workspace = "stage"
+  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
 }
