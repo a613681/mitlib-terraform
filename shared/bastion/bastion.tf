@@ -44,15 +44,11 @@ resource "aws_s3_bucket_object" "ssh_public_keys" {
 }
 
 module "latest_ami" {
-  source = "git::https://github.com/mitlibraries/tf-mod-latest-ami?ref=initial"
-}
-
-module "remote_state" {
-  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
+  source = "git::https://github.com/mitlibraries/tf-mod-latest-ami?ref=master"
 }
 
 module "bastion" {
-  source                    = "git::https://github.com/mitlibraries/tf-mod-bastion-host?ref=initial"
+  source                    = "git::https://github.com/mitlibraries/tf-mod-bastion-host?ref=master"
   name                      = "bastion"
   instance_type             = "t3.nano"
   ami                       = "${module.latest_ami.ec2_linux_ami_id}"
@@ -60,10 +56,10 @@ module "bastion" {
   key_name                  = "mit-dornera"
   iam_instance_profile      = "s3_readonly-allow_associateaddress-${terraform.workspace}"
   s3_bucket_name            = "${aws_s3_bucket.ssh_public_keys.bucket}"
-  vpc_id                    = "${module.remote_state.vpc_id}"
+  vpc_id                    = "${module.shared.vpc_id}"
   allowed_cidr              = ["18.18.36.11/32", "18.100.0.0/16", "18.101.0.0/16"]
   logzio_token              = "${var.logzio_token}"
-  subnet_ids                = ["${module.remote_state.public_subnets}"]
+  subnet_ids                = ["${module.shared.public_subnets}"]
   eip                       = "${aws_eip.bastion.public_ip}"
   apply_changes_immediately = "true"
   keys_update_frequency     = "0 0 * * 0"
@@ -83,7 +79,7 @@ resource "aws_eip" "bastion" {
 }
 
 resource "aws_route53_record" "bastion" {
-  zone_id = "${module.remote_state.public_zoneid}"
+  zone_id = "${module.shared.public_zoneid}"
   name    = "${module.bastion.name}.mitlib.net"
   type    = "A"
   ttl     = "300"
