@@ -2,7 +2,7 @@
 #We will investigate options for generating SSL certificates in the future
 
 module "grand_web" {
-  source               = "git::https://github.com/mitlibraries/tf-mod-cdn-s3?ref=initial"
+  source               = "git::https://github.com/mitlibraries/tf-mod-cdn-s3?ref=master"
   name                 = "grandchallenges"
   aliases              = ["grandchallenges.mitlib.net"]
   ext_aliases          = ["grandchallenges.mit.edu"]
