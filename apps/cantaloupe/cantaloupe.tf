@@ -80,10 +80,49 @@ module "fargate" {
 ###################
 ### Deploy user ###
 ###################
+data "aws_iam_policy_document" "deploy_policy" {
+  # allows user to deploy to ecs
+  statement {
+    sid = "ecs"
+
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "ecs:DescribeTaskDefinition",
+      "ecs:RegisterTaskDefinition",
+      "ecs:UpdateService",
+      "sts:GetCallerIdentity",
+      "events:ListTargetsByRule",
+      "events:PutTargets",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  # allows user to run ecs task using task execution and app roles
+  statement {
+    sid = "AppRole"
+
+    actions = [
+      "iam:PassRole",
+    ]
+
+    resources = [
+      "${module.fargate.service_role_arn}",
+      "${module.fargate.task_role_arn}",
+    ]
+  }
+}
 
 resource "aws_iam_user" "deploy" {
   name = "${module.label.name}-deploy"
   tags = "${module.label.tags}"
+}
+
+resource "aws_iam_user_policy" "deploy" {
+  user   = "${aws_iam_user.deploy.name}"
+  policy = "${data.aws_iam_policy_document.deploy_policy.json}"
 }
 
 resource "aws_iam_user_policy_attachment" "deploy_ecr" {
