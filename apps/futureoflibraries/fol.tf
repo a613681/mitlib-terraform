@@ -1,9 +1,9 @@
 resource "aws_route53_record" "fol" {
   name    = "future-of-libraries"
   ttl     = 300
-  type    = "A"
+  type    = "CNAME"
   zone_id = "${module.shared.public_zoneid}"
-  records = ["18.9.49.56"]
+  records = ["live-mitlib-futureoflibraries.pantheonsite.io"]
 }
 
 resource "aws_route53_record" "fol_dev" {
@@ -17,7 +17,7 @@ resource "aws_route53_record" "fol_dev" {
 resource "aws_route53_record" "fol_test" {
   name    = "future-of-libraries-test"
   ttl     = 300
-  type    = "A"
+  type    = "CNAME"
   zone_id = "${module.shared.public_zoneid}"
-  records = ["18.9.49.57"]
+  records = ["test-mitlib-futureoflibraries.pantheonsite.io"]
 }
