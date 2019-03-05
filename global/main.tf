@@ -6,7 +6,7 @@ provider "aws" {
 #Create S3 bucket and DynamoDB for locking
 module "tfstate-backend" {
   source    = "cloudposse/tfstate-backend/aws"
-  version   = "0.2.0"
+  version   = "0.3.1"
   namespace = "mit"
   stage     = ""
   name      = "tfstates"
