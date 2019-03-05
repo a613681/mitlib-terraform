@@ -75,7 +75,7 @@ resource "aws_route53_record" "simile-web" {
   name    = "${aws_route53_zone.simile.name}"
   type    = "A"
   ttl     = "300"
-  records = ["18.9.49.52"]
+  records = ["18.23.238.206"]
 }
 
 resource "aws_route53_record" "simile-trunk" {
@@ -83,7 +83,7 @@ resource "aws_route53_record" "simile-trunk" {
   name    = "trunk.${aws_route53_zone.simile.name}"
   type    = "A"
   ttl     = "300"
-  records = ["18.9.49.116"]
+  records = ["18.23.238.206"]
 }
 
 resource "aws_route53_record" "simile-service" {
@@ -91,7 +91,7 @@ resource "aws_route53_record" "simile-service" {
   name    = "service.${aws_route53_zone.simile.name}"
   type    = "A"
   ttl     = "300"
-  records = ["18.9.49.117"]
+  records = ["18.23.238.65"]
 }
 
 resource "aws_route53_record" "simile-api" {
