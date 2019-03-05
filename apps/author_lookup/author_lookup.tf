@@ -162,6 +162,59 @@ resource "aws_iam_user" "default" {
   tags = "${module.label.tags}"
 }
 
+data "aws_iam_policy_document" "deploy" {
+  statement {
+    actions = [
+      "lambda:AddPermission",
+      "lambda:CreateFunction",
+      "lambda:DeleteFunction",
+      "lambda:GetFunction",
+      "lambda:GetFunctionConfiguration",
+      "lambda:GetPolicy",
+      "lambda:InvokeFunction",
+      "lambda:ListVersionsByFunction",
+      "lambda:RemovePermission",
+      "lambda:UpdateFunctionCode",
+      "lambda:UpdateFunctionConfiguration",
+      "iam:PassRole",
+      "cloudformation:CreateStack",
+      "cloudformation:DeleteStack",
+      "cloudformation:DescribeStackResource",
+      "cloudformation:DescribeStacks",
+      "cloudformation:ListStackResources",
+      "cloudformation:UpdateStack",
+      "apigateway:OPTIONS",
+      "apigateway:DELETE",
+      "apigateway:GET",
+      "apigateway:PATCH",
+      "apigateway:POST",
+      "apigateway:PUT",
+      "events:DeleteRule",
+      "events:DescribeRule",
+      "events:ListRules",
+      "events:ListTargetsByRule",
+      "events:ListRuleNamesByTarget",
+      "events:PutRule",
+      "events:PutTargets",
+      "events:RemoveTargets",
+      "route53:ListHostedZones",
+      "route53:ListResourceRecordSets",
+      "route53:ChangeResourceRecordSets",
+      "route53:GetHostedZone",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "deploy" {
+  name   = "${module.label.name}-deploy"
+  policy = "${data.aws_iam_policy_document.deploy.json}"
+  user   = "${aws_iam_user.default.name}"
+}
+
 resource "aws_iam_user_policy_attachment" "default" {
   user       = "${aws_iam_user.default.name}"
   policy_arn = "${module.bucket.readwrite_arn}"
