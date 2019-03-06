@@ -99,7 +99,7 @@ resource "aws_route53_record" "simile-api" {
   name    = "api.${aws_route53_zone.simile.name}"
   type    = "A"
   ttl     = "300"
-  records = ["18.9.49.118"]
+  records = ["18.23.238.99"]
 }
 
 # Add hosted zone and DNS entry for dpworkshop.org
