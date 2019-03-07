@@ -1,9 +1,9 @@
 resource "aws_route53_record" "oatf" {
   name    = "open-access"
   ttl     = 300
-  type    = "A"
+  type    = "CNAME"
   zone_id = "${module.shared.public_zoneid}"
-  records = ["18.9.49.139"]
+  records = ["live-mitlib-openaccess.pantheonsite.io"]
 }
 
 resource "aws_route53_record" "oatf_dev" {
@@ -11,13 +11,13 @@ resource "aws_route53_record" "oatf_dev" {
   ttl     = 300
   type    = "CNAME"
   zone_id = "${module.shared.public_zoneid}"
-  records = ["dev-mitlib-oatf.pantheonsite.io"]
+  records = ["dev-mitlib-openaccess.pantheonsite.io"]
 }
 
 resource "aws_route53_record" "oatf_test" {
   name    = "open-access-test"
   ttl     = 300
-  type    = "A"
+  type    = "CNAME"
   zone_id = "${module.shared.public_zoneid}"
-  records = ["18.9.49.142"]
+  records = ["test-mitlib-openaccess.pantheonsite.io"]
 }
