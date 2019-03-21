@@ -27,3 +27,8 @@ output "mit_saml_arn" {
   description = "MIT Identity provider arn (SAML Federated login)"
   value       = "${aws_iam_saml_provider.mit.arn}"
 }
+
+output "docsvcs_beanstalk_name" {
+  description = "Name of Docsvcs Elastic Beanstalk application"
+  value       = "${aws_elastic_beanstalk_application.docsvcs.name}"
+}
