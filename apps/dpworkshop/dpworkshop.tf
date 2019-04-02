@@ -35,23 +35,23 @@ resource "aws_route53_record" "dpworkshop-soa" {
   ]
 }
 
+# Create dpworkshop.org DNS entries
 resource "aws_route53_record" "dpworkshop-web" {
   zone_id = "${aws_route53_zone.dpworkshop.id}"
   name    = "${aws_route53_zone.dpworkshop.name}"
   type    = "A"
   ttl     = "300"
-  records = ["18.9.49.70"]
+  records = ["23.185.0.3"]
 }
 
-# Create dpworkshop.org DNS entries
-/*resource "aws_route53_record" "dpworkshop" {
-  name    = "${aws_route53_zone.dpworkshop.name}"
-  ttl     = 300
-  type    = "CNAME"
+resource "aws_route53_record" "dpworkshop-web1" {
   zone_id = "${aws_route53_zone.dpworkshop.id}"
-  records = ["live-mitlib-dpworkshop.pantheonsite.io"]
+  name    = "${aws_route53_zone.dpworkshop.name}"
+  type    = "AAAA"
+  ttl     = "300"
+  records = ["2620:12a:8000::3", "2620:12a:8001::3"]
 }
-*/
+
 resource "aws_route53_record" "dpworkshop_dev" {
   name    = "dev"
   ttl     = 300
