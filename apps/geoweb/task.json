@@ -1,0 +1,27 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "geoserver"
+      }
+    },
+    "secrets": [
+      {
+        "name": "GEOSERVER_PASSWORD",
+        "valueFrom": "${geoserver_password}"
+      }
+    ],
+    "portMappings": [
+      {
+        "containerPort": 8080
+      }
+    ],
+    "memoryReservation": 1024
+
+  }
+]
