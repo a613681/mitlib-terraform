@@ -41,14 +41,6 @@ module "task" {
       value = "BasicLookupStrategy"
     },
     {
-      name  = "S3SOURCE_BASICLOOKUPSTRATEGY_PATH_PREFIX"
-      value = ""
-    },
-    {
-      name  = "S3SOURCE_BASICLOOKUPSTRATEGY_PATH_SUFFIX"
-      value = ""
-    },
-    {
       name  = "S3SOURCE_ACCESS_KEY_ID"
       value = "${aws_iam_access_key.s3store.id}"
     },
@@ -75,22 +67,6 @@ module "task" {
     {
       name  = "CACHE_SERVER_DERIVATIVE"
       value = "S3Cache"
-    },
-    {
-      name  = "S3CACHE_OBJECT_KEY_PREFIX"
-      value = ""
-    },
-    {
-      name  = "PROCESSOR_JP2"
-      value = "OpenJpegProcessor"
-    },
-    {
-      name  = "PROCESSOR_JPG_QUALITY"
-      value = "80"
-    },
-    {
-      name  = "PROCESSOR_TIF_COMPRESSION"
-      value = "LZW"
     },
     {
       name  = "LOG_APPLICATION_LEVEL"
