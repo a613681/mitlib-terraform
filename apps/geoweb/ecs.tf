@@ -109,16 +109,19 @@ data "aws_ami" "default" {
 resource "aws_launch_configuration" "default" {
   name_prefix          = "${module.label.name}"
   instance_type        = "t3.small"
-  security_groups      = ["${aws_security_group.ecs.id}"]
+  security_groups      = ["${aws_security_group.ecs.id}", "${module.shared.bastion_ingress_sgid}"]
   image_id             = "${data.aws_ami.default.id}"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_inst_prof.id}"
+  key_name             = "mit-dornera"
 
   user_data = <<EOT
     #!/bin/bash
     echo ECS_CLUSTER=${aws_ecs_cluster.default.name} >> /etc/ecs/ecs.config
-    mkdir -p /mnt/efs
-    echo "${aws_efs_file_system.default.dns_name}:/ /mnt/efs efs _netdev 0 0" >> /etc/fstab
-    mount -a -t efs defaults
+    sudo yum -y update && sudo yum install -y amazon-efs-utils
+    sudo mkdir -p /mnt/geo_efs
+    sudo echo "${aws_efs_file_system.geo_efs.dns_name}:/ /mnt/geo_efs efs _netdev 0 0" >> /etc/fstab
+    sudo mount -a -t efs defaults
+    sudo chown ec2-user:ec2-user /mnt/geo_efs
     EOT
 
   lifecycle {
@@ -127,7 +130,7 @@ resource "aws_launch_configuration" "default" {
 }
 
 resource "aws_autoscaling_group" "default" {
-  name                 = "${module.label.name}-asg"
+  name_prefix          = "${aws_launch_configuration.default.name}-"
   max_size             = 4
   min_size             = 2
   desired_capacity     = 2
@@ -136,44 +139,14 @@ resource "aws_autoscaling_group" "default" {
   target_group_arns    = ["${module.alb_ingress.target_group_arn}"]
   launch_configuration = "${aws_launch_configuration.default.id}"
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = ["${concat(
        list(
-       map("key", "Name", "value", "${module.label.name}",  "propagate_at_launch", true)))
+       map("key", "Name", "value", "${module.label.name}",  "propagate_at_launch", true),
+       map("key", "terraform", "value", "true",  "propagate_at_launch", true),
+       map("key", "environment", "value", "${terraform.workspace}",  "propagate_at_launch", true)))
        }"]
-}
-
-#######
-# EFS #
-#######
-resource "aws_security_group" "efs" {
-  name        = "${module.label.name}-efs-sg"
-  description = "Allow NFS access from Geoweb ECS cluster"
-  tags        = "${module.label.tags}"
-  vpc_id      = "${module.shared.vpc_id}"
-
-  ingress {
-    from_port       = 2049
-    to_port         = 2049
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.ecs.id}"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_efs_file_system" "default" {
-  creation_token = "${module.label.name}-efs"
-  tags           = "${module.label.tags}"
-}
-
-resource "aws_efs_mount_target" "default" {
-  count           = "${length(module.shared.private_subnets)}"
-  file_system_id  = "${aws_efs_file_system.default.id}"
-  subnet_id       = "${element(module.shared.private_subnets, count.index)}"
-  security_groups = ["${aws_security_group.efs.id}"]
 }
