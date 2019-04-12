@@ -1,22 +1,3 @@
-locals {
-  env = "${terraform.workspace}"
-
-  shared_alb_dns = {
-    "stage" = "${module.shared.alb_restricted_dnsname}"
-    "prod"  = "${module.shared.alb_public_dnsname}"
-  }
-
-  shared_alb_listeners = {
-    "stage" = "${module.shared.alb_restricted_https_listener_arn}"
-    "prod"  = "${module.shared.alb_public_https_listener_arn}"
-  }
-
-  shared_alb_sgids = {
-    "stage" = "${module.shared.alb_restricted_sgid}"
-    "prod"  = "${module.shared.alb_public_sgid}"
-  }
-}
-
 module "label_geoserver" {
   source = "git::https://github.com/MITLibraries/tf-mod-name?ref=master"
   name   = "geoserver"
@@ -104,17 +85,6 @@ data "aws_iam_policy_document" "ssm" {
   }
 }
 
-data "aws_iam_policy_document" "ecs_task_exec" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals = {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-  }
-}
-
 resource "aws_iam_role" "geosrv_exec" {
   name               = "${module.label_geoserver.name}-exec"
   tags               = "${module.label.tags}"
@@ -136,17 +106,6 @@ resource "aws_iam_role_policy_attachment" "ecs_login_attach" {
 resource "aws_iam_role_policy_attachment" "ecs_read_attach" {
   role       = "${aws_iam_role.geosrv_exec.name}"
   policy_arn = "${module.ecr.policy_read_arn}"
-}
-
-data "aws_iam_policy_document" "cloudwatch_policy" {
-  statement {
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-
-    resources = ["*"]
-  }
 }
 
 resource "aws_iam_role_policy" "cloudwatch_attach" {

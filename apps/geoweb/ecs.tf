@@ -119,9 +119,12 @@ resource "aws_launch_configuration" "default" {
     echo ECS_CLUSTER=${aws_ecs_cluster.default.name} >> /etc/ecs/ecs.config
     sudo yum -y update && sudo yum install -y amazon-efs-utils
     sudo mkdir -p /mnt/geo_efs
+    sudo mkdir -p /mnt/solr_efs
     sudo echo "${aws_efs_file_system.geo_efs.dns_name}:/ /mnt/geo_efs efs _netdev 0 0" >> /etc/fstab
+    sudo echo "${aws_efs_file_system.solr_efs.dns_name}:/ /mnt/solr_efs efs _netdev 0 0" >> /etc/fstab
     sudo mount -a -t efs defaults
     sudo chown ec2-user:ec2-user /mnt/geo_efs
+    sudo chown ec2-user:ec2-user /mnt/solr_efs
     EOT
 
   lifecycle {
