@@ -69,7 +69,7 @@ module "eb_docsvcs" {
   environment_type            = "SingleInstance"
   rolling_update_type         = "Time"
   updating_min_in_service     = "0"
-  solution_stack_name         = "64bit Amazon Linux 2018.03 v2.8.7 running PHP 5.4"
+  solution_stack_name         = "64bit Amazon Linux 2018.03 v2.8.8 running PHP 5.4"
   zone_id                     = "${module.shared.public_zoneid}"
   ssh_source_restriction      = "18.0.0.0/9"
   enable_managed_actions      = "false"
@@ -87,7 +87,8 @@ module "eb_docsvcs" {
     "RDS_PASSWORD",  "${var.rds_password}",
     "RDS_DB_NAME",   "docsvcs",
     "LETSENCRYPT_DOMAIN", "docsvcs-${terraform.workspace}.mitlib.net",
-    "LETSENCRYPT_EMAIL", "${var.ssl_email}"
+    "LETSENCRYPT_EMAIL", "${var.ssl_email}",
+    "ENVIRONMENT", "${terraform.workspace}"
     )
   }"
 }
