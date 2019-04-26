@@ -1,11 +1,6 @@
 module "label" {
   source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
-  name   = "docsvcs"
-}
-
-module "label_rds" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
-  name   = "docsvcs-rds"
+  name   = "document-services"
 }
 
 resource "aws_security_group" "default" {
@@ -58,7 +53,7 @@ module "eb_docsvcs" {
 
   app     = "${module.shared.docsvcs_app_name}"
   keypair = "mit-dornera"
-  name    = "docsvcs"
+  name    = "document-services"
   vpc_id  = "${module.shared.vpc_id}"
 
   # We use public_subnets here since it's a singleInstance that needs to be accessed publicly
@@ -86,7 +81,7 @@ module "eb_docsvcs" {
     "RDS_USERNAME",  "${var.rds_username}",
     "RDS_PASSWORD",  "${var.rds_password}",
     "RDS_DB_NAME",   "docsvcs",
-    "LETSENCRYPT_DOMAIN", "docsvcs-${terraform.workspace}.mitlib.net",
+    "LETSENCRYPT_DOMAIN", "${module.label.name}.mitlib.net",
     "LETSENCRYPT_EMAIL", "${var.ssl_email}",
     "ENVIRONMENT", "${terraform.workspace}"
     )
