@@ -10,7 +10,7 @@ terraform {
   backend "s3" {
     region         = "us-east-1"
     bucket         = "mit-tfstates-state"
-    key            = "apps/iasc-diponline.tfstate"
+    key            = "apps/lib-digitalobjects.tfstate"
     dynamodb_table = "mit-tfstates-state-lock"
     encrypt        = true
   }
