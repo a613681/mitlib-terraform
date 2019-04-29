@@ -25,6 +25,19 @@ resource "aws_security_group" "default" {
   tags = "${module.label.tags}"
 }
 
+# Create an S3 Bucket to store MIT cert and key, and attach to beanstalk instance profile for access
+
+module "s3_cert_store" {
+  source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  name               = "document-services-certstore"
+  versioning_enabled = "false"
+}
+
+resource "aws_iam_role_policy_attachment" "default_ro" {
+  role       = "${module.eb_docsvcs.ec2_instance_profile_role_name}"
+  policy_arn = "${module.s3_cert_store.readonly_arn}"
+}
+
 module "rds_docsvcs" {
   source                      = "git::https://github.com/mitlibraries/tf-mod-rds?ref=master"
   engine                      = "mysql"
@@ -59,7 +72,7 @@ module "eb_docsvcs" {
   # We use public_subnets here since it's a singleInstance that needs to be accessed publicly
   instance_subnets            = ["${module.shared.public_subnets}"]
   security_groups             = ["${aws_security_group.default.id}"]
-  instance_type               = "t3.micro"
+  instance_type               = "t3.nano"
   associate_public_ip_address = "true"
   environment_type            = "SingleInstance"
   rolling_update_type         = "Time"
@@ -71,19 +84,22 @@ module "eb_docsvcs" {
   autoscale_min               = "1"
   autoscale_max               = "1"
 
-  #PHP variables
+  # PHP variables
   document_root = "/"
 
-  #Environment Variables
+  # Environment Variables
+  # BUCKET_ID and *_S3 Variables are used for SSL config and are deployed via .ebxtensions in the app
   env_vars = "${
     map(
     "RDS_HOSTNAME",  "${join(",", module.rds_docsvcs.hostname)}",
     "RDS_USERNAME",  "${var.rds_username}",
     "RDS_PASSWORD",  "${var.rds_password}",
     "RDS_DB_NAME",   "docsvcs",
-    "LETSENCRYPT_DOMAIN", "${module.label.name}.mitlib.net",
-    "LETSENCRYPT_EMAIL", "${var.ssl_email}",
-    "ENVIRONMENT", "${terraform.workspace}"
+    "ENVIRONMENT", "${terraform.workspace}",
+    "BUCKET_ID", "${module.s3_cert_store.bucket_id}",
+    "INCOMMON_S3", "https://${module.s3_cert_store.bucket_domain_name}/InCommonChain.crt",
+    "CERT_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.crt",
+    "KEY_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.key"
     )
   }"
 }
