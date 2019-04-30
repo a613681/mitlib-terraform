@@ -65,7 +65,7 @@ module "eb_docsvcs" {
   source = "git::https://github.com/mitlibraries/tf-mod-elasticbeanstalk-env?ref=master"
 
   app     = "${module.shared.docsvcs_app_name}"
-  keypair = "mit-dornera"
+  keypair = "mit-mjbernha"
   name    = "document-services"
   vpc_id  = "${module.shared.vpc_id}"
 
