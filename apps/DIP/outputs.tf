@@ -19,3 +19,15 @@ output "mario_deploy_secret_access_key" {
   sensitive   = true
   description = "Secret access key for mario deploy user."
 }
+
+output "timdex_access_key_secret" {
+  value       = "${aws_iam_access_key.timdex.secret}"
+  sensitive   = true
+  description = "Secret access key for timdex user."
+}
+
+output "timdex_access_key_id" {
+  value       = "${aws_iam_access_key.timdex.id}"
+  sensitive   = true
+  description = "ID for timdex user."
+}
