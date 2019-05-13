@@ -16,12 +16,23 @@
         "valueFrom": "${geoserver_password}"
       }
     ],
+    "environment": [
+      {
+        "name": "GEOSERVER_DATA_DIR",
+        "value": "${data_dir}"
+      }
+    ],
     "portMappings": [
       {
         "containerPort": 8080
       }
     ],
-    "memoryReservation": 1024
-
+    "memoryReservation": 1024,
+    "mountPoints": [
+      {
+        "containerPath": "${data_dir}",
+        "sourceVolume": "geo_efs"
+      }
+    ]
   }
 ]
