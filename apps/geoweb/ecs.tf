@@ -3,6 +3,11 @@ module "label" {
   name   = "geo-ecs"
 }
 
+locals {
+  geoserver_mount = "/mnt/geo_efs"
+  solr_mount      = "/mnt/solr_efs"
+}
+
 #######
 # IAM #
 #######
@@ -112,19 +117,19 @@ resource "aws_launch_configuration" "default" {
   security_groups      = ["${aws_security_group.ecs.id}", "${module.shared.bastion_ingress_sgid}"]
   image_id             = "${data.aws_ami.default.id}"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_inst_prof.id}"
-  key_name             = "mit-dornera"
+  key_name             = "mit-mgraves"
 
   user_data = <<EOT
     #!/bin/bash
     echo ECS_CLUSTER=${aws_ecs_cluster.default.name} >> /etc/ecs/ecs.config
     sudo yum -y update && sudo yum install -y amazon-efs-utils
-    sudo mkdir -p /mnt/geo_efs
-    sudo mkdir -p /mnt/solr_efs
-    sudo echo "${aws_efs_file_system.geo_efs.dns_name}:/ /mnt/geo_efs efs _netdev 0 0" >> /etc/fstab
-    sudo echo "${aws_efs_file_system.solr_efs.dns_name}:/ /mnt/solr_efs efs _netdev 0 0" >> /etc/fstab
+    sudo mkdir -p ${local.geoserver_mount}
+    sudo mkdir -p ${local.solr_mount}
+    sudo echo "${aws_efs_file_system.geo_efs.dns_name}:/ ${local.geoserver_mount} efs _netdev 0 0" >> /etc/fstab
+    sudo echo "${aws_efs_file_system.solr_efs.dns_name}:/ ${local.solr_mount} efs _netdev 0 0" >> /etc/fstab
     sudo mount -a -t efs defaults
-    sudo chown ec2-user:ec2-user /mnt/geo_efs
-    sudo chown ec2-user:ec2-user /mnt/solr_efs
+    sudo chown ec2-user:ec2-user ${local.geoserver_mount}
+    sudo chown ec2-user:ec2-user ${local.solr_mount}
     EOT
 
   lifecycle {

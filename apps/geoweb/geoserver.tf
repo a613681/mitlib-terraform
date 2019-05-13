@@ -53,6 +53,7 @@ data "template_file" "default" {
     image              = "${module.ecr.registry_url}"
     log_group          = "${aws_cloudwatch_log_group.default.name}"
     geoserver_password = "${aws_ssm_parameter.geoserver_password.arn}"
+    data_dir           = "/var/geoserver/data"
   }
 }
 
@@ -76,6 +77,11 @@ resource "aws_ecs_task_definition" "geoserver" {
   tags                     = "${module.label_geoserver.tags}"
   execution_role_arn       = "${aws_iam_role.geosrv_exec.arn}"
   network_mode             = "bridge"
+
+  volume {
+    name      = "geo_efs"
+    host_path = "${local.geoserver_mount}"
+  }
 }
 
 data "aws_iam_policy_document" "ssm" {

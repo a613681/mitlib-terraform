@@ -45,6 +45,7 @@ data "template_file" "solrtask" {
     name      = "${module.label_solr.name}"
     image     = "${module.solr_ecr.registry_url}"
     log_group = "${aws_cloudwatch_log_group.solr.name}"
+    solr_home = "/var/solr"
   }
 }
 
@@ -68,6 +69,11 @@ resource "aws_ecs_task_definition" "solrtask" {
   tags                     = "${module.label_solr.tags}"
   execution_role_arn       = "${aws_iam_role.solr_exec.arn}"
   network_mode             = "bridge"
+
+  volume {
+    name      = "solr_efs"
+    host_path = "${local.solr_mount}"
+  }
 }
 
 resource "aws_iam_role" "solr_exec" {

@@ -10,12 +10,23 @@
         "awslogs-stream-prefix": "geosolr"
       }
     },
+    "environment": [
+      {
+        "name": "SOLR_HOME",
+        "value": "${solr_home}"
+      }
+    ],
     "portMappings": [
       {
         "containerPort": 8983
       }
     ],
-    "memoryReservation": 1024
-
+    "memoryReservation": 1024,
+    "mountPoints": [
+      {
+        "containerPath": "${solr_home}",
+        "sourceVolume": "solr_efs"
+      }
+    ]
   }
 ]
