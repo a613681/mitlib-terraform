@@ -44,6 +44,7 @@ data "aws_iam_policy_document" "read" {
     resources = [
       "${module.shared.es_arn}/aleph*",
       "${module.shared.es_arn}/production*",
+      "${module.shared.es_arn}/timdex*",
     ]
   }
 }
