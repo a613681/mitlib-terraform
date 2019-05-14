@@ -67,6 +67,11 @@ resource "aws_iam_user_policy_attachment" "solrdeploy_ecr" {
   policy_arn = "${module.solr_ecr.policy_readwrite_arn}"
 }
 
+resource "aws_iam_user_policy_attachment" "slingshot_deploy_ecr" {
+  user       = "${aws_iam_user.deploy.name}"
+  policy_arn = "${module.slingshot_ecr.policy_readwrite_arn}"
+}
+
 resource "aws_iam_access_key" "deploy" {
   user = "${aws_iam_user.deploy.name}"
 }
