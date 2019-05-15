@@ -3,7 +3,7 @@ module "label" {
   name   = "libraries-website"
 }
 
-resource "aws_security_group" "libraries-website-stage-sg" {
+resource "aws_security_group" "default" {
   name        = "${module.label.name}-sg"
   description = "${module.label.name} ec2 security group"
   tags        = "${module.label.tags}"
@@ -63,20 +63,20 @@ module "db" {
 
   # Use the two private subnets in the MIT VPC
   subnet_ids                  = ["subnet-0e7fc7820ca9a9474", "subnet-057ad698467b9c692"]
-  security_group_ids          = ["${aws_security_group.libraries-website-stage-sg.id}"]
+  security_group_ids          = ["${aws_security_group.default.id}"]
   major_engine_version        = "10.3"
   allow_major_version_upgrade = "false"
   apply_immediately           = "true"
   dns_zone_id                 = "${module.shared.private_zoneid}"
 }
 
-resource "aws_instance" "libraries-website-stage" {
+resource "aws_instance" "default" {
   instance_type = "t3.small"
   ami           = "ami-011b3ccf1bd6db744"
 
   # Use the public MIT 18net subnet for this host's "private" ip
   subnet_id                   = "subnet-0744a5c9beeb49a20"
-  vpc_security_group_ids      = ["${aws_security_group.libraries-website-stage-sg.id}"]
+  vpc_security_group_ids      = ["${aws_security_group.default.id}"]
   ebs_optimized               = "true"
   key_name                    = "vab-aws"
   associate_public_ip_address = "false"
@@ -96,7 +96,7 @@ resource "aws_route53_record" "libraries-website" {
   ttl     = "300"
 
   # Pointed at the 18net IP address.
-  records = ["${aws_instance.libraries-website-stage.*.private_ip}"]
+  records = ["${aws_instance.default.*.private_ip}"]
   count   = "${var.enabled == "true" ? 1 : 0}"
 
   # The mitlib.net zone
