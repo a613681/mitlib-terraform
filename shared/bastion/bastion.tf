@@ -1,7 +1,7 @@
 #Create an S3 bucket and policy for storing our SSH public keys
 #Move this part +public keys folder to the module?
 variable "ssh_public_key_names" {
-  default = "andy,alex,mikey"
+  default = "alex,mike"
 }
 
 resource "aws_s3_bucket" "ssh_public_keys" {
@@ -53,7 +53,7 @@ module "bastion" {
   instance_type             = "t3.nano"
   ami                       = "${module.latest_ami.ec2_linux_ami_id}"
   region                    = "${var.aws_region}"
-  key_name                  = "mit-dornera"
+  key_name                  = "mit-mgraves"
   iam_instance_profile      = "s3_readonly-allow_associateaddress-${terraform.workspace}"
   s3_bucket_name            = "${aws_s3_bucket.ssh_public_keys.bucket}"
   vpc_id                    = "${module.shared.vpc_id}"
