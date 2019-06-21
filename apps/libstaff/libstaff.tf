@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "default" {
       test     = "IpAddress"
       variable = "aws:SourceIp"
 
-      values = ["18.100.0.0/16", "18.101.0.0/16"]
+      values = ["18.28.0.0/16", "18.30.0.0/16"]
     }
   }]
 }
