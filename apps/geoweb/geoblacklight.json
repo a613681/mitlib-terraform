@@ -1,0 +1,33 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "geoblacklight"
+      }
+    },
+    "environment": [
+      {"name": "RAILS_ENV", "value": "production"},
+      {"name": "RAILS_LOG_TO_STDOUT", "value": "1"},
+      {"name": "RAILS_SERVE_STATIC_FILES", "value": "1"},
+      {"name": "POSTGRES_DATABASE", "value": "${postgres_database}"},
+      {"name": "POSTGRES_HOST", "value": "${postgres_host}"},
+      {"name": "POSTGRES_USERNAME", "value": "${postgres_user}"},
+      {"name": "SOLR_URL", "value": "${solr_url}"}
+    ],
+    "secrets": [
+      {"name": "SECRET_KEY_BASE", "valueFrom": "${secret_key}"},
+      {"name": "POSTGRES_PASSWORD", "valueFrom": "${postgres_password}"}
+    ],
+    "portMappings": [
+      {
+        "containerPort": 3000
+      }
+    ],
+    "memoryReservation": 1024
+  }
+]

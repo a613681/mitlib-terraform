@@ -1,0 +1,27 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "slingshot"
+      }
+    },
+    "secrets": [
+      {"name": "PG_PASSWORD", "valueFrom": "${pg_password}"},
+      {"name": "GEOSERVER_PASSWORD", "valueFrom": "${geoserver_password}"}
+    ],
+    "memoryReservation": 512,
+    "command": [
+      "initialize",
+      "--db-user", "${pg_user}",
+      "--db-host", "${pg_host}",
+      "--db-database", "${pg_name}",
+      "--geoserver", "${geoserver_url}",
+      "--geoserver-user", "${geoserver_user}"
+    ]
+  }
+]
