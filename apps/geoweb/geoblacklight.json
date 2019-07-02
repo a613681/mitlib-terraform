@@ -17,11 +17,14 @@
       {"name": "POSTGRES_DATABASE", "value": "${postgres_database}"},
       {"name": "POSTGRES_HOST", "value": "${postgres_host}"},
       {"name": "POSTGRES_USERNAME", "value": "${postgres_user}"},
-      {"name": "SOLR_URL", "value": "${solr_url}"}
+      {"name": "SOLR_URL", "value": "${solr_url}"},
+      {"name": "OGC_PROXY_HOST", "value": "${ogc_proxy_host}"},
+      {"name": "OGC_PROXY_USERNAME", "value": "${ogc_proxy_username}"}
     ],
     "secrets": [
       {"name": "SECRET_KEY_BASE", "valueFrom": "${secret_key}"},
-      {"name": "POSTGRES_PASSWORD", "valueFrom": "${postgres_password}"}
+      {"name": "POSTGRES_PASSWORD", "valueFrom": "${postgres_password}"},
+      {"name": "OGC_PROXY_PASSWORD", "valueFrom": "${ogc_proxy_password}"}
     ],
     "portMappings": [
       {
