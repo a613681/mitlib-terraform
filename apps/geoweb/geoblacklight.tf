@@ -55,15 +55,18 @@ data "template_file" "geoblacklight" {
   template = "${file("${path.module}/geoblacklight.json")}"
 
   vars = {
-    name              = "${module.label_geoblacklight.name}"
-    image             = "${module.geoblacklight_ecr.registry_url}"
-    log_group         = "${aws_cloudwatch_log_group.default.name}"
-    secret_key        = "${aws_ssm_parameter.secret_key.arn}"
-    postgres_database = "${var.postgres_database}"
-    postgres_host     = "${module.rds.hostname[0]}"
-    postgres_user     = "${var.postgres_username}"
-    postgres_password = "${aws_ssm_parameter.postgres_password.arn}"
-    solr_url          = "http://${aws_route53_record.solr_dns.fqdn}:8983/solr/geoweb"
+    name               = "${module.label_geoblacklight.name}"
+    image              = "${module.geoblacklight_ecr.registry_url}"
+    log_group          = "${aws_cloudwatch_log_group.default.name}"
+    secret_key         = "${aws_ssm_parameter.secret_key.arn}"
+    postgres_database  = "${var.postgres_database}"
+    postgres_host      = "${module.rds.hostname[0]}"
+    postgres_user      = "${var.postgres_username}"
+    postgres_password  = "${aws_ssm_parameter.postgres_password.arn}"
+    solr_url           = "http://${aws_route53_record.solr_dns.fqdn}:8983/solr/geoweb"
+    ogc_proxy_host     = "http://${aws_route53_record.geoserver_dns.fqdn}:8080"
+    ogc_proxy_username = "${var.geoserver_username}"
+    ogc_proxy_password = "${aws_ssm_parameter.geoserver_password.arn}"
   }
 }
 
@@ -74,6 +77,7 @@ data "aws_iam_policy_document" "geoblacklight_ssm" {
     resources = [
       "${aws_ssm_parameter.secret_key.arn}",
       "${aws_ssm_parameter.postgres_password.arn}",
+      "${aws_ssm_parameter.geoserver_password.arn}",
     ]
   }
 }
