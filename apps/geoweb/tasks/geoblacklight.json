@@ -19,12 +19,17 @@
       {"name": "POSTGRES_USERNAME", "value": "${postgres_user}"},
       {"name": "SOLR_URL", "value": "${solr_url}"},
       {"name": "OGC_PROXY_HOST", "value": "${ogc_proxy_host}"},
-      {"name": "OGC_PROXY_USERNAME", "value": "${ogc_proxy_username}"}
+      {"name": "OGC_PROXY_USERNAME", "value": "${ogc_proxy_username}"},
+      {"name": "AWS_REGION", "value": "us-east-1"},
+      {"name": "AWS_S3_BUCKET", "value": "${download_bucket}"},
+      {"name": "AWS_ACCESS_KEY_ID", "value": "${download_access_key}"},
+      {"name": "AUTH_TYPE", "value": "developer"}
     ],
     "secrets": [
       {"name": "SECRET_KEY_BASE", "valueFrom": "${secret_key}"},
       {"name": "POSTGRES_PASSWORD", "valueFrom": "${postgres_password}"},
-      {"name": "OGC_PROXY_PASSWORD", "valueFrom": "${ogc_proxy_password}"}
+      {"name": "OGC_PROXY_PASSWORD", "valueFrom": "${ogc_proxy_password}"},
+      {"name": "AWS_SECRET_ACCESS_KEY", "valueFrom": "${download_secret_key}"}
     ],
     "portMappings": [
       {

@@ -15,9 +15,14 @@ locals {
     "stage" = "${module.shared.alb_restricted_sgid}"
     "prod"  = "${module.shared.alb_public_sgid}"
   }
+
+  shared_alb_zoneid = {
+    "stage" = "${module.shared.alb_restricted_zone_id}"
+    "prod"  = "${module.shared.alb_public_zone_id}"
+  }
 }
 
-module "label_geoweb" {
+module "label" {
   source = "git::https://github.com/MITLibraries/tf-mod-name?ref=master"
   name   = "geoweb"
 }
@@ -57,8 +62,8 @@ data "aws_iam_policy" "ecs_exec" {
 ###################
 
 resource "aws_iam_user" "deploy" {
-  name = "${module.label_geoweb.name}-deploy"
-  tags = "${module.label_geoweb.tags}"
+  name = "${module.label.name}-deploy"
+  tags = "${module.label.tags}"
 }
 
 resource "aws_iam_user_policy_attachment" "slingshot_deploy_ecr" {
@@ -73,4 +78,13 @@ resource "aws_iam_user_policy_attachment" "geoblacklight_deploy_ecr" {
 
 resource "aws_iam_access_key" "deploy" {
   user = "${aws_iam_user.deploy.name}"
+}
+
+#############
+## Logging ##
+#############
+resource "aws_cloudwatch_log_group" "default" {
+  name              = "${module.label.name}"
+  tags              = "${module.label.tags}"
+  retention_in_days = 30
 }

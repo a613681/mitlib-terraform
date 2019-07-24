@@ -35,6 +35,11 @@ data "aws_iam_policy_document" "slingshot_storage" {
   }
 
   statement {
+    actions   = ["s3:*ObjectAcl"]
+    resources = ["${aws_s3_bucket.slingshot_storage.arn}/*"]
+  }
+
+  statement {
     actions   = ["s3:ListBucket"]
     resources = ["${aws_s3_bucket.slingshot_storage.arn}"]
   }
@@ -64,12 +69,6 @@ data "aws_iam_policy_document" "slingshot_ssm" {
 ############################
 ## Slingshot Fargate task ##
 ############################
-resource "aws_cloudwatch_log_group" "slingshot" {
-  name              = "${module.label_slingshot.name}"
-  tags              = "${module.label_slingshot.tags}"
-  retention_in_days = 30
-}
-
 resource "aws_iam_role" "slingshot" {
   name               = "${module.label_slingshot.name}-ecs"
   tags               = "${module.label_slingshot.tags}"
@@ -117,7 +116,7 @@ resource "aws_ecs_cluster" "slingshot" {
 }
 
 data "template_file" "slingshot" {
-  template = "${file("${path.module}/slingshot.json")}"
+  template = "${file("${path.module}/tasks/slingshot.json")}"
 
   vars = {
     name               = "${module.label_slingshot.name}"
@@ -127,13 +126,14 @@ data "template_file" "slingshot" {
     pg_host            = "${module.rds.hostname[0]}"
     pg_name            = "${var.postgres_database}"
     pg_password        = "${aws_ssm_parameter.postgres_password.arn}"
-    geoserver_url      = "http://${aws_route53_record.geoserver_dns.fqdn}:8080/geoserver"
+    geoserver_url      = "http://${module.geoserver.fqdn}:8080/geoserver"
     geoserver_user     = "${var.geoserver_username}"
     geoserver_password = "${aws_ssm_parameter.geoserver_password.arn}"
-    solr_url           = "http://${aws_route53_record.solr_dns.fqdn}:8983/solr/geoweb"
+    solr_url           = "http://${module.solr.fqdn}:8983/solr/geoweb"
     dynamo_table       = "${aws_dynamodb_table.layers.name}"
     upload_bucket      = "${module.geoweb_upload.bucket_id}"
     storage_bucket     = "${aws_s3_bucket.slingshot_storage.id}"
+    ogc_proxy          = "https://${aws_route53_record.geoblacklight.fqdn}/ogc"
   }
 }
 
@@ -144,19 +144,19 @@ resource "aws_ecs_task_definition" "slingshot" {
   execution_role_arn       = "${aws_iam_role.slingshot.arn}"
   task_role_arn            = "${aws_iam_role.slingshot_task.arn}"
   network_mode             = "awsvpc"
-  cpu                      = 256
-  memory                   = 512
+  cpu                      = 2048
+  memory                   = 4096
   tags                     = "${module.label_slingshot.tags}"
 }
 
 data "template_file" "slingshot_init" {
-  template = "${file("${path.module}/slingshot-init.json")}"
+  template = "${file("${path.module}/tasks/slingshot-init.json")}"
 
   vars = {
     name               = "${module.label_slingshot.name}-init"
     image              = "${module.slingshot_ecr.registry_url}"
     log_group          = "${aws_cloudwatch_log_group.default.name}"
-    geoserver_url      = "http://${aws_route53_record.geoserver_dns.fqdn}:8080/geoserver"
+    geoserver_url      = "http://${module.geoserver.fqdn}:8080/geoserver"
     geoserver_user     = "${var.geoserver_username}"
     geoserver_password = "${aws_ssm_parameter.geoserver_password.arn}"
     pg_user            = "${var.postgres_username}"
@@ -175,4 +175,64 @@ resource "aws_ecs_task_definition" "slingshot_init" {
   cpu                      = 256
   memory                   = 512
   tags                     = "${module.label_slingshot.tags}"
+}
+
+#########################
+## Cloudwatch Cron Job ##
+#########################
+
+data "aws_iam_policy_document" "cloudwatch_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals = {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "cloudwatch_run_task_policy" {
+  statement {
+    actions   = ["ecs:RunTask", "iam:PassRole"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "cloudwatch_task_role" {
+  name               = "${module.label_slingshot.name}-cloudwatch"
+  description        = "Cloudwatch role for running slingshot Fargate task"
+  tags               = "${module.label_slingshot.tags}"
+  assume_role_policy = "${data.aws_iam_policy_document.cloudwatch_assume_role_policy.json}"
+}
+
+resource "aws_iam_role_policy" "cloudwatch_run_task" {
+  name   = "${module.label_slingshot.name}-cloudwatch-run"
+  role   = "${aws_iam_role.cloudwatch_task_role.name}"
+  policy = "${data.aws_iam_policy_document.cloudwatch_run_task_policy.json}"
+}
+
+resource "aws_cloudwatch_event_rule" "default" {
+  name                = "${module.label_slingshot.name}"
+  description         = "Slingshot data load"
+  is_enabled          = false
+  schedule_expression = "cron(0 9 * * ? *)"
+  tags                = "${module.label_slingshot.tags}"
+}
+
+resource "aws_cloudwatch_event_target" "default" {
+  rule     = "${aws_cloudwatch_event_rule.default.name}"
+  arn      = "${aws_ecs_cluster.slingshot.arn}"
+  role_arn = "${aws_iam_role.cloudwatch_task_role.arn}"
+
+  ecs_target = {
+    launch_type         = "FARGATE"
+    task_count          = 1
+    task_definition_arn = "${aws_ecs_task_definition.slingshot.arn}"
+
+    network_configuration = {
+      subnets         = ["${module.shared.private_subnets}"]
+      security_groups = ["${aws_security_group.geoblacklight.id}"]
+    }
+  }
 }

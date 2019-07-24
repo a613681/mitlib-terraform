@@ -18,6 +18,7 @@ module "rds" {
 
   security_group_ids = [
     "${module.shared.bastion_ingress_sgid}",
+    "${aws_security_group.geoserver.id}",
     "${aws_security_group.geoblacklight.id}",
   ]
 

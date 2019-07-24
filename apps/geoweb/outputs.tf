@@ -13,3 +13,19 @@ output "secret_access_key" {
   description = "Secret key for deploy user"
   sensitive   = true
 }
+
+output "gbl_downloader_user" {
+  value       = "${aws_iam_user.gbl_downloader.name}"
+  description = "Name of GBL downloader user"
+}
+
+output "gbl_downloader_key" {
+  value       = "${aws_iam_access_key.gbl_downloader.id}"
+  description = "GBL downloader access key"
+}
+
+output "gbl_downloader_secret" {
+  value       = "${aws_iam_access_key.gbl_downloader.secret}"
+  description = "GBL downloader secret key"
+  sensitive   = true
+}
