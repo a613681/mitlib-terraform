@@ -72,6 +72,11 @@ output "alb_restricted_all_ingress_sgid" {
   value       = "${module.all_access_from_alb.this_security_group_id}"
 }
 
+output "alb_restricted_zone_id" {
+  description = "Restricted ALB zone id"
+  value       = "${module.alb_restricted.alb_zone_id}"
+}
+
 # Public
 output "alb_public_arn" {
   description = "Public ALB arn"
@@ -116,4 +121,9 @@ output "alb_public_https_listener_arn" {
 output "alb_public_all_ingress_sgid" {
   description = "Public ALB security group ID allowing all ingress traffic from ALB"
   value       = "${module.all_access_from_alb_public.this_security_group_id}"
+}
+
+output "alb_public_zone_id" {
+  description = "Public ALB zone id"
+  value       = "${module.alb_public.alb_zone_id}"
 }
