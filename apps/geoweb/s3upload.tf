@@ -42,3 +42,23 @@ resource "aws_iam_role_policy_attachment" "geoweb_upload" {
   role       = "${aws_iam_role.geoweb_upload.name}"
   policy_arn = "${module.geoweb_upload.admin_arn}"
 }
+
+########
+## GBL user to download layers.
+## This should be removed and replaced by the container's
+##   role.
+########
+
+resource "aws_iam_user" "gbl_downloader" {
+  name = "${module.label.name}-gbl-downloader"
+  tags = "${module.label.tags}"
+}
+
+resource "aws_iam_user_policy_attachment" "gbl_downloader" {
+  user       = "${aws_iam_user.gbl_downloader.name}"
+  policy_arn = "${module.geoweb_upload.readonly_arn}"
+}
+
+resource "aws_iam_access_key" "gbl_downloader" {
+  user = "${aws_iam_user.gbl_downloader.name}"
+}

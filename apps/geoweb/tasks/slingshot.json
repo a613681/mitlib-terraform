@@ -14,7 +14,7 @@
       {"name": "PG_PASSWORD", "valueFrom": "${pg_password}"},
       {"name": "GEOSERVER_PASSWORD", "valueFrom": "${geoserver_password}"}
     ],
-    "memoryReservation": 512,
+    "memoryReservation": 4096,
     "command": [
       "publish",
       "--publish-all",
@@ -27,7 +27,8 @@
       "--dynamo-table", "${dynamo_table}",
       "--upload-bucket", "${upload_bucket}",
       "--storage-bucket", "${storage_bucket}",
-      "--num-workers", "5"
+      "--num-workers", "5",
+      "--ogc-proxy", "${ogc_proxy}"
     ]
   }
 ]
