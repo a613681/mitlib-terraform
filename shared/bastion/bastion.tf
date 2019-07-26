@@ -85,25 +85,3 @@ resource "aws_route53_record" "bastion" {
   ttl     = "300"
   records = ["${aws_eip.bastion.public_ip}"]
 }
-
-resource "aws_security_group" "from_bastion_sg" {
-  description = "Access from ${module.bastion.name}"
-  vpc_id      = "${module.shared.vpc_id}"
-  name        = "ingress-from-${module.bastion.name}"
-
-  ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    security_groups = ["${module.bastion.security_group_id}"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = "${module.bastion.tags}"
-}
