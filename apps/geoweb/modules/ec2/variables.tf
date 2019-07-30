@@ -31,3 +31,9 @@ variable "vpc" {
   type        = "string"
   description = "VPC ID to deploy to"
 }
+
+variable "instance_profile" {
+  type        = "string"
+  description = "IAM instance profile to attach to instance"
+  default     = ""
+}

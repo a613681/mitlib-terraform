@@ -32,11 +32,12 @@ resource "aws_instance" "default" {
 
   vpc_security_group_ids = ["${var.security_groups}"]
 
-  ami       = "${data.aws_ami.default.id}"
-  key_name  = "${var.key_name}"
-  subnet_id = "${var.subnet}"
-  tags      = "${module.label.tags}"
-  user_data = "${data.template_file.default.rendered}"
+  ami                  = "${data.aws_ami.default.id}"
+  key_name             = "${var.key_name}"
+  subnet_id            = "${var.subnet}"
+  tags                 = "${module.label.tags}"
+  user_data            = "${data.template_file.default.rendered}"
+  iam_instance_profile = "${var.instance_profile}"
 
   lifecycle {
     create_before_destroy = true

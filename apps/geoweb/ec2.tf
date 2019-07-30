@@ -54,15 +54,57 @@ resource "aws_security_group" "solr" {
   }
 }
 
+data "aws_iam_policy_document" "geoserver" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "geoserver_s3" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.slingshot_storage.arn}/*"]
+  }
+
+  statement {
+    actions   = ["s3:ListBucket"]
+    resources = ["${aws_s3_bucket.slingshot_storage.arn}"]
+  }
+}
+
+resource "aws_iam_role" "geoserver" {
+  name               = "geoserver-${module.label.name}"
+  tags               = "${module.label.tags}"
+  description        = "IAM role for Geoserver EC2 instance."
+  assume_role_policy = "${data.aws_iam_policy_document.geoserver.json}"
+}
+
+resource "aws_iam_role_policy" "geoserver_s3" {
+  name   = "geoserver-s3-${module.label.name}"
+  role   = "${aws_iam_role.geoserver.name}"
+  policy = "${data.aws_iam_policy_document.geoserver_s3.json}"
+}
+
+resource "aws_iam_instance_profile" "geoserver" {
+  name = "geoserver-${module.label.name}"
+  role = "${aws_iam_role.geoserver.name}"
+}
+
 module "geoserver" {
-  source          = "./modules/ec2"
-  name            = "geoserver"
-  vpc             = "${module.shared.vpc_id}"
-  subnet          = "${module.shared.private_subnets[0]}"
-  mount           = "/mnt/geoserver"
-  security_groups = ["${aws_security_group.geoserver.id}"]
-  key_name        = "mit-mgraves"
-  zone            = "${module.shared.private_zoneid}"
+  source           = "./modules/ec2"
+  name             = "geoserver"
+  vpc              = "${module.shared.vpc_id}"
+  subnet           = "${module.shared.private_subnets[0]}"
+  mount            = "/mnt/geoserver"
+  security_groups  = ["${aws_security_group.geoserver.id}"]
+  key_name         = "mit-mgraves"
+  zone             = "${module.shared.private_zoneid}"
+  instance_profile = "${aws_iam_instance_profile.geoserver.name}"
 }
 
 module "solr" {
