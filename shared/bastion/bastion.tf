@@ -57,7 +57,7 @@ module "bastion" {
   iam_instance_profile      = "s3_readonly-allow_associateaddress-${terraform.workspace}"
   s3_bucket_name            = "${aws_s3_bucket.ssh_public_keys.bucket}"
   vpc_id                    = "${module.shared.vpc_id}"
-  allowed_cidr              = ["18.18.36.11/32", "18.28.0.0/16", "18.30.0.0/16"]
+  allowed_cidr              = ["18.28.0.0/16", "18.30.0.0/16"]
   logzio_token              = "${var.logzio_token}"
   subnet_ids                = ["${module.shared.public_subnets}"]
   eip                       = "${aws_eip.bastion.public_ip}"
