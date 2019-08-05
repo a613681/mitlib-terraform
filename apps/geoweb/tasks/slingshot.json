@@ -28,7 +28,8 @@
       "--upload-bucket", "${upload_bucket}",
       "--storage-bucket", "${storage_bucket}",
       "--num-workers", "5",
-      "--ogc-proxy", "${ogc_proxy}"
+      "--ogc-proxy", "${ogc_proxy}",
+      "--download-url", "${download_url}"
     ]
   }
 ]
