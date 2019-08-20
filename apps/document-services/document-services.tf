@@ -99,7 +99,9 @@ module "eb_docsvcs" {
     "BUCKET_ID", "${module.s3_cert_store.bucket_id}",
     "INCOMMON_S3", "https://${module.s3_cert_store.bucket_domain_name}/InCommonChain.crt",
     "CERT_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.crt",
-    "KEY_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.key"
+    "KEY_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.key",
+    "CYBERSOURCE_ACCESS_KEY", "${var.cybersource_access_key}",
+    "CYBERSOURCE_PROFILE_ID", "${var.cybersource_profile_id}"
     )
   }"
 }
