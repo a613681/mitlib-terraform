@@ -21,3 +21,27 @@ variable "cybersource_profile_id" {
   default     = ""
   description = "Identifier passed to MIT Merchant Services to ensure payments are classified correctly"
 }
+
+variable "mail_host" {
+  type        = "string"
+  default     = ""
+  description = "Hostname of external SMTP email server"
+}
+
+variable "mail_password" {
+  type        = "string"
+  default     = ""
+  description = "Password associated with account used to send email"
+}
+
+variable "mail_port" {
+  type        = "string"
+  default     = ""
+  description = "Port used to connect to external SMTP email server"
+}
+
+variable "mail_username" {
+  type        = "string"
+  default     = ""
+  description = "Username associated with account used to send email"
+}

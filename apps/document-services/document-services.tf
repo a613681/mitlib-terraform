@@ -101,7 +101,11 @@ module "eb_docsvcs" {
     "CERT_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.crt",
     "KEY_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.key",
     "CYBERSOURCE_ACCESS_KEY", "${var.cybersource_access_key}",
-    "CYBERSOURCE_PROFILE_ID", "${var.cybersource_profile_id}"
+    "CYBERSOURCE_PROFILE_ID", "${var.cybersource_profile_id}",
+    "MAIL_HOST", "${var.mail_host}",
+    "MAIL_PASSWORD", "${var.mail_password}",
+    "MAIL_PORT", "${var.mail_port}",
+    "MAIL_USERNAME", "${var.mail_username}"
     )
   }"
 }
