@@ -119,3 +119,66 @@ module "solr" {
   zone            = "${module.shared.private_zoneid}"
   instance_type   = "${var.instance_type}"
 }
+
+#################
+## EFS Backups ##
+#################
+
+data "aws_iam_policy_document" "backups" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals = {
+      type        = "Service"
+      identifiers = ["backup.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "backups" {
+  name               = "backups-${module.label.name}"
+  tags               = "${module.label.tags}"
+  description        = "IAM role for EFS backups"
+  assume_role_policy = "${data.aws_iam_policy_document.backups.json}"
+}
+
+resource "aws_iam_role_policy_attachment" "backup_attach" {
+  role       = "${aws_iam_role.backups.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+}
+
+resource "aws_iam_role_policy_attachment" "backup_restore" {
+  role       = "${aws_iam_role.backups.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+}
+
+resource "aws_backup_vault" "default" {
+  name = "${module.label.name}"
+  tags = "${module.label.tags}"
+}
+
+resource "aws_backup_plan" "default" {
+  name = "${module.label.name}"
+  tags = "${module.label.tags}"
+
+  rule {
+    rule_name         = "${module.label.name}"
+    target_vault_name = "${aws_backup_vault.default.name}"
+    schedule          = "cron(0 5 ? * * *)"
+
+    lifecycle {
+      delete_after = "${var.efs_backup_days}"
+    }
+  }
+}
+
+resource "aws_backup_selection" "default" {
+  name         = "${module.label.name}"
+  plan_id      = "${aws_backup_plan.default.id}"
+  iam_role_arn = "${aws_iam_role.backups.arn}"
+
+  resources = [
+    "${module.geoserver.efs}",
+    "${module.solr.efs}",
+  ]
+}

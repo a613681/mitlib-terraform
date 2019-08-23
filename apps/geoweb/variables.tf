@@ -37,6 +37,12 @@ variable instance_type {
   default     = "t3.small"
 }
 
+variable efs_backup_days {
+  type        = "string"
+  description = "Days of EFS backup to keep"
+  default     = "15"
+}
+
 variable geoserver_username {
   type        = "string"
   description = "GeoServer username"
