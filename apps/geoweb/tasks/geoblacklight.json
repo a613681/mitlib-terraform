@@ -14,6 +14,7 @@
       {"name": "RAILS_ENV", "value": "production"},
       {"name": "RAILS_LOG_TO_STDOUT", "value": "1"},
       {"name": "RAILS_SERVE_STATIC_FILES", "value": "1"},
+      {"name": "RAILS_MAX_THREADS", "value": "${rails_max_threads}"},
       {"name": "POSTGRES_DATABASE", "value": "${postgres_database}"},
       {"name": "POSTGRES_HOST", "value": "${postgres_host}"},
       {"name": "POSTGRES_USERNAME", "value": "${postgres_user}"},
@@ -23,19 +24,25 @@
       {"name": "AWS_REGION", "value": "us-east-1"},
       {"name": "AWS_S3_BUCKET", "value": "${download_bucket}"},
       {"name": "AWS_ACCESS_KEY_ID", "value": "${download_access_key}"},
-      {"name": "AUTH_TYPE", "value": "developer"}
+      {"name": "AUTH_TYPE", "value": "${rails_auth_type}"},
+      {"name": "IDP_METADATA_URL", "value": "${idp_metadata_url}"},
+      {"name": "IDP_ENTITY_ID", "value": "${idp_entity_id}"},
+      {"name": "IDP_SSO_URL", "value": "${idp_sso_url}"},
+      {"name": "SP_ENTITY_ID", "value": "${sp_entity_id}"},
+      {"name": "URN_EMAIL", "value": "${urn_email}"},
+      {"name": "SP_CERTIFICATE", "value": "${sp_certificate}"}
     ],
     "secrets": [
       {"name": "SECRET_KEY_BASE", "valueFrom": "${secret_key}"},
       {"name": "POSTGRES_PASSWORD", "valueFrom": "${postgres_password}"},
       {"name": "OGC_PROXY_PASSWORD", "valueFrom": "${ogc_proxy_password}"},
-      {"name": "AWS_SECRET_ACCESS_KEY", "valueFrom": "${download_secret_key}"}
+      {"name": "AWS_SECRET_ACCESS_KEY", "valueFrom": "${download_secret_key}"},
+      {"name": "SP_PRIVATE_KEY", "valueFrom": "${sp_private_key}"}
     ],
     "portMappings": [
       {
         "containerPort": 3000
       }
-    ],
-    "memoryReservation": 1024
+    ]
   }
 ]

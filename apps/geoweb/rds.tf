@@ -2,8 +2,8 @@ module "rds" {
   source             = "git::https://github.com/mitlibraries/tf-mod-rds?ref=master"
   engine             = "postgres"
   engine_version     = "11.1"
-  instance_class     = "db.t3.small"
-  allocated_storage  = 160
+  instance_class     = "${var.postgres_instance_type}"
+  allocated_storage  = "${var.postgres_storage_size}"
   storage_type       = "gp2"
   name               = "geo-postgis"
   database_name      = "${var.postgres_database}"

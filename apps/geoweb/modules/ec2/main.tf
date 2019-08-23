@@ -28,7 +28,7 @@ data "template_file" "default" {
 }
 
 resource "aws_instance" "default" {
-  instance_type = "t3.small"
+  instance_type = "${var.instance_type}"
 
   vpc_security_group_ids = ["${var.security_groups}"]
 

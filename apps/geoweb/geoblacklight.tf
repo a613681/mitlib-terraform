@@ -19,7 +19,7 @@ resource "aws_lb_listener_rule" "geoblacklight" {
 
   condition {
     field  = "host-header"
-    values = ["${aws_route53_record.geoblacklight.name}"]
+    values = ["${var.geoblacklight_public_domain}"]
   }
 }
 
@@ -46,7 +46,7 @@ resource "aws_lb_target_group" "geoblacklight" {
 # Create a Route53 DNS entry to our ALB
 resource "aws_route53_record" "geoblacklight" {
   zone_id = "${module.shared.public_zoneid}"
-  name    = "${module.label_geoblacklight.name}.mitlib.net"
+  name    = "${var.geoblacklight_internal_domain}"
   type    = "A"
 
   alias {
@@ -77,6 +77,13 @@ resource "aws_ssm_parameter" "gbl_download_secret" {
   value = "${aws_iam_access_key.gbl_downloader.secret}"
 }
 
+resource "aws_ssm_parameter" "sp_private_key" {
+  name  = "${module.label_geoblacklight.name}-sp-private-key"
+  tags  = "${module.label_geoblacklight.tags}"
+  type  = "SecureString"
+  value = "${var.sp_private_key}"
+}
+
 data "template_file" "geoblacklight" {
   template = "${file("${path.module}/tasks/geoblacklight.json")}"
 
@@ -96,6 +103,15 @@ data "template_file" "geoblacklight" {
     download_bucket     = "${module.geoweb_upload.bucket_id}"
     download_access_key = "${aws_iam_access_key.gbl_downloader.id}"
     download_secret_key = "${aws_ssm_parameter.gbl_download_secret.arn}"
+    rails_max_threads   = "${var.rails_max_threads}"
+    rails_auth_type     = "${var.rails_auth_type}"
+    idp_metadata_url    = "${var.idp_metadata_url}"
+    idp_entity_id       = "${var.idp_entity_id}"
+    idp_sso_url         = "${var.idp_sso_url}"
+    sp_entity_id        = "${var.sp_entity_id}"
+    urn_email           = "${var.urn_email}"
+    sp_certificate      = "${var.sp_certificate}"
+    sp_private_key      = "${aws_ssm_parameter.sp_private_key.arn}"
   }
 }
 
@@ -108,6 +124,7 @@ data "aws_iam_policy_document" "geoblacklight_ssm" {
       "${aws_ssm_parameter.postgres_password.arn}",
       "${aws_ssm_parameter.geoserver_password.arn}",
       "${aws_ssm_parameter.gbl_download_secret.arn}",
+      "${aws_ssm_parameter.sp_private_key.arn}",
     ]
   }
 }
@@ -163,8 +180,8 @@ resource "aws_ecs_task_definition" "geoblacklight" {
   tags                     = "${module.label_geoblacklight.tags}"
   execution_role_arn       = "${aws_iam_role.geoblacklight.arn}"
   network_mode             = "awsvpc"
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = "${var.geoblacklight_cpu}"
+  memory                   = "${var.geoblacklight_memory}"
   tags                     = "${module.label_geoblacklight.tags}"
 }
 

@@ -24,8 +24,8 @@ resource "aws_dynamodb_table" "layers" {
 ## S3 storage bucket ##
 #######################
 resource "aws_s3_bucket" "slingshot_storage" {
-  bucket_prefix = "${module.label_slingshot.name}-storage"
-  tags          = "${module.label_slingshot.tags}"
+  bucket = "${var.storage_bucket_name}"
+  tags   = "${module.label_slingshot.tags}"
 }
 
 data "aws_iam_policy_document" "slingshot_storage" {
@@ -133,7 +133,8 @@ data "template_file" "slingshot" {
     dynamo_table       = "${aws_dynamodb_table.layers.name}"
     upload_bucket      = "${module.geoweb_upload.bucket_id}"
     storage_bucket     = "${aws_s3_bucket.slingshot_storage.id}"
-    ogc_proxy          = "https://${aws_route53_record.geoblacklight.fqdn}/ogc"
+    ogc_proxy          = "https://${var.geoblacklight_public_domain}/ogc"
+    download_url       = "https://${var.geoblacklight_public_domain}/mit_download"
   }
 }
 

@@ -105,6 +105,7 @@ module "geoserver" {
   key_name         = "mit-mgraves"
   zone             = "${module.shared.private_zoneid}"
   instance_profile = "${aws_iam_instance_profile.geoserver.name}"
+  instance_type    = "${var.instance_type}"
 }
 
 module "solr" {
@@ -116,4 +117,5 @@ module "solr" {
   security_groups = ["${aws_security_group.solr.id}"]
   key_name        = "mit-mgraves"
   zone            = "${module.shared.private_zoneid}"
+  instance_type   = "${var.instance_type}"
 }
