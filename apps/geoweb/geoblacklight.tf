@@ -10,7 +10,7 @@ module "geoblacklight_ecr" {
 
 resource "aws_lb_listener_rule" "geoblacklight" {
   listener_arn = "${lookup(local.shared_alb_listeners, local.env)}"
-  priority     = 103
+  priority     = 107
 
   action {
     type             = "forward"
@@ -40,6 +40,116 @@ resource "aws_lb_target_group" "geoblacklight" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+###
+# The four following rules can probably be removed at some point, but there's
+# no real cost to us maintaining them. They can be consolidated into two rules
+# once https://github.com/terraform-providers/terraform-provider-aws/pull/8268
+# is merged.
+###
+resource "aws_lb_listener_rule" "geoblacklight_redirect_wms_1" {
+  listener_arn = "${lookup(local.shared_alb_listeners, local.env)}"
+  priority     = 103
+
+  action {
+    type             = "redirect"
+    target_group_arn = "${aws_lb_target_group.geoblacklight.arn}"
+
+    redirect {
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+      path        = "/ogc/wms"
+    }
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.geoblacklight_public_domain}"]
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["/geoserver/wms"]
+  }
+}
+
+resource "aws_lb_listener_rule" "geoblacklight_redirect_wms_2" {
+  listener_arn = "${lookup(local.shared_alb_listeners, local.env)}"
+  priority     = 104
+
+  action {
+    type             = "redirect"
+    target_group_arn = "${aws_lb_target_group.geoblacklight.arn}"
+
+    redirect {
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+      path        = "/ogc/wms"
+    }
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.geoblacklight_public_domain}"]
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["/mitgeoserver/wms"]
+  }
+}
+
+resource "aws_lb_listener_rule" "geoblacklight_redirect_wfs_1" {
+  listener_arn = "${lookup(local.shared_alb_listeners, local.env)}"
+  priority     = 105
+
+  action {
+    type             = "redirect"
+    target_group_arn = "${aws_lb_target_group.geoblacklight.arn}"
+
+    redirect {
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+      path        = "/ogc/wfs"
+    }
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.geoblacklight_public_domain}"]
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["/geoserver/wfs"]
+  }
+}
+
+resource "aws_lb_listener_rule" "geoblacklight_redirect_wfs_2" {
+  listener_arn = "${lookup(local.shared_alb_listeners, local.env)}"
+  priority     = 106
+
+  action {
+    type             = "redirect"
+    target_group_arn = "${aws_lb_target_group.geoblacklight.arn}"
+
+    redirect {
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+      path        = "/ogc/wfs"
+    }
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.geoblacklight_public_domain}"]
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["/mitgeoserver/wfs"]
   }
 }
 
