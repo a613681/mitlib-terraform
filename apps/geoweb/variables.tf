@@ -26,6 +26,12 @@ variable postgres_storage_size {
   default     = "160"
 }
 
+variable postgres_backup_retention {
+  type        = "string"
+  description = "Number of days of Postgres backups to keep"
+  default     = "0"
+}
+
 variable secret_key {
   type        = "string"
   description = "Rails secret key"

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "geoblacklight-cleanup"
+      }
+    },
+    "environment": [
+      {"name": "PGHOST", "value": "${pg_host}"},
+      {"name": "PGUSER", "value": "${pg_user}"},
+      {"name": "PGDATABASE", "value": "${pg_name}"}
+    ],
+    "secrets": [
+      {"name": "PGPASSWORD", "valueFrom": "${pg_password}"}
+    ],
+    "memoryReservation": 512,
+    "command": [
+      "psql",
+      "-c",
+      "DELETE FROM searches WHERE updated_at <= NOW() - INTERVAL '24 HOURS'",
+      "-c",
+      "DELETE FROM users WHERE guest IS TRUE AND updated_at <= NOW() - INTERVAL '24 HOURS'"
+    ]
+  }
+]

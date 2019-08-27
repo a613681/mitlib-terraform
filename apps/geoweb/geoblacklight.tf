@@ -315,3 +315,54 @@ resource "aws_ecs_service" "geoblacklight" {
 
   tags = "${module.label_geoblacklight.tags}"
 }
+
+data "template_file" "geoblacklight_cleanup" {
+  template = "${file("${path.module}/tasks/geoblacklight-cleanup.json")}"
+
+  vars = {
+    name        = "${module.label_geoblacklight.name}-cleanup"
+    image       = "postgres:alpine"
+    log_group   = "${aws_cloudwatch_log_group.default.name}"
+    pg_user     = "${var.postgres_username}"
+    pg_host     = "${module.rds.hostname[0]}"
+    pg_name     = "${var.postgres_database}"
+    pg_password = "${aws_ssm_parameter.postgres_password.arn}"
+  }
+}
+
+resource "aws_ecs_task_definition" "geoblacklight_cleanup" {
+  family                   = "${module.label_geoblacklight.name}-cleanup"
+  container_definitions    = "${data.template_file.geoblacklight_cleanup.rendered}"
+  requires_compatibilities = ["FARGATE"]
+  tags                     = "${module.label_geoblacklight.tags}"
+  execution_role_arn       = "${aws_iam_role.geoblacklight.arn}"
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  tags                     = "${module.label_geoblacklight.tags}"
+}
+
+resource "aws_cloudwatch_event_rule" "geoblacklight_cleanup" {
+  name                = "${module.label_geoblacklight.name}-cleanup"
+  description         = "Geoblacklight database cleanup"
+  is_enabled          = true
+  schedule_expression = "cron(0 6 * * ? *)"
+  tags                = "${module.label_geoblacklight.tags}"
+}
+
+resource "aws_cloudwatch_event_target" "geoblacklight_cleanup" {
+  rule     = "${aws_cloudwatch_event_rule.geoblacklight_cleanup.name}"
+  arn      = "${aws_ecs_cluster.slingshot.arn}"
+  role_arn = "${aws_iam_role.cloudwatch_task_role.arn}"
+
+  ecs_target = {
+    launch_type         = "FARGATE"
+    task_count          = 1
+    task_definition_arn = "${aws_ecs_task_definition.geoblacklight_cleanup.arn}"
+
+    network_configuration = {
+      subnets         = ["${module.shared.private_subnets}"]
+      security_groups = ["${aws_security_group.geoblacklight.id}"]
+    }
+  }
+}
