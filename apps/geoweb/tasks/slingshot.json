@@ -14,7 +14,7 @@
       {"name": "PG_PASSWORD", "valueFrom": "${pg_password}"},
       {"name": "GEOSERVER_PASSWORD", "valueFrom": "${geoserver_password}"}
     ],
-    "memoryReservation": 4096,
+    "memoryReservation": 512,
     "command": [
       "publish",
       "--publish-all",
