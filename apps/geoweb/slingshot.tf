@@ -145,8 +145,8 @@ resource "aws_ecs_task_definition" "slingshot" {
   execution_role_arn       = "${aws_iam_role.slingshot.arn}"
   task_role_arn            = "${aws_iam_role.slingshot_task.arn}"
   network_mode             = "awsvpc"
-  cpu                      = 2048
-  memory                   = 4096
+  cpu                      = 256
+  memory                   = 512
   tags                     = "${module.label_slingshot.tags}"
 }
 
@@ -216,8 +216,8 @@ resource "aws_iam_role_policy" "cloudwatch_run_task" {
 resource "aws_cloudwatch_event_rule" "default" {
   name                = "${module.label_slingshot.name}"
   description         = "Slingshot data load"
-  is_enabled          = false
-  schedule_expression = "cron(0 9 * * ? *)"
+  is_enabled          = true
+  schedule_expression = "cron(0 12 * * ? *)"
   tags                = "${module.label_slingshot.tags}"
 }
 
