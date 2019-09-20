@@ -3,7 +3,7 @@
 ######################
 #Creates default restricted (18.0.0.0/9) ALB that uses *.mitlib.net cert by default
 module "alb_restricted" {
-  source                    = "git::https://github.com/mitlibraries/tf-mod-alb?ref=master"
+  source                    = "github.com/mitlibraries/tf-mod-alb?ref=0.11"
   name                      = "alb-restricted"
   http_ingress_cidr_blocks  = ["${var.alb_cidrs}"]
   https_ingress_cidr_blocks = ["${var.alb_cidrs}"]
@@ -17,7 +17,7 @@ module "alb_restricted" {
 }
 
 module "sg_label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "alb-restricted"
 }
 
@@ -48,7 +48,7 @@ module "all_access_from_alb" {
 #########################
 #Creates default public ALB that uses *.mitlib.net cert by default
 module "alb_public" {
-  source              = "git::https://github.com/mitlibraries/tf-mod-alb?ref=master"
+  source              = "github.com/mitlibraries/tf-mod-alb?ref=0.11"
   name                = "alb-public"
   vpc_id              = "${module.vpc.vpc_id}"
   ip_address_type     = "ipv4"
@@ -60,7 +60,7 @@ module "alb_public" {
 }
 
 module "sg_label_public" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "alb-public"
 }
 

@@ -1,5 +1,5 @@
 module "rds" {
-  source                  = "git::https://github.com/mitlibraries/tf-mod-rds?ref=master"
+  source                  = "github.com/mitlibraries/tf-mod-rds?ref=0.11"
   engine                  = "postgres"
   engine_version          = "11.1"
   instance_class          = "${var.postgres_instance_type}"

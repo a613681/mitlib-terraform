@@ -6,17 +6,17 @@ locals = {
 }
 
 module "secret" {
-  source = "git::https://github.com/mitlibraries/tf-mod-secrets?ref=master"
+  source = "github.com/mitlibraries/tf-mod-secrets?ref=0.11"
   name   = "carbon"
 }
 
 module "ecr" {
-  source = "git::https://github.com/mitlibraries/tf-mod-ecr?ref=master"
+  source = "github.com/mitlibraries/tf-mod-ecr?ref=0.11"
   name   = "carbon"
 }
 
 module "label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "carbon"
 }
 

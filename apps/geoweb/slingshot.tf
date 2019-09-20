@@ -1,10 +1,10 @@
 module "label_slingshot" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "slingshot"
 }
 
 module "slingshot_ecr" {
-  source = "git::https://github.com/mitlibraries/tf-mod-ecr?ref=master"
+  source = "github.com/mitlibraries/tf-mod-ecr?ref=0.11"
   name   = "slingshot"
 }
 

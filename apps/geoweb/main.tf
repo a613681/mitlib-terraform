@@ -16,5 +16,5 @@ terraform {
 }
 
 module "shared" {
-  source = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
+  source = "github.com/mitlibraries/tf-mod-shared-provider?ref=0.11"
 }

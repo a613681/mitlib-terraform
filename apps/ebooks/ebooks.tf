@@ -1,5 +1,5 @@
 module "label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "ebooks"
 }
 
@@ -11,7 +11,7 @@ resource "aws_iam_user" "default" {
 }
 
 module "ebooks" {
-  source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
   name               = "ebooks"
   versioning_enabled = "true"
 }

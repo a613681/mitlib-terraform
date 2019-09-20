@@ -44,11 +44,11 @@ resource "aws_s3_bucket_object" "ssh_public_keys" {
 }
 
 module "latest_ami" {
-  source = "git::https://github.com/mitlibraries/tf-mod-latest-ami?ref=master"
+  source = "github.com/mitlibraries/tf-mod-latest-ami?ref=0.11"
 }
 
 module "bastion" {
-  source                    = "git::https://github.com/mitlibraries/tf-mod-bastion-host?ref=master"
+  source                    = "github.com/mitlibraries/tf-mod-bastion-host?ref=0.11"
   name                      = "bastion"
   instance_type             = "t3.nano"
   ami                       = "${module.latest_ami.ec2_linux_ami_id}"

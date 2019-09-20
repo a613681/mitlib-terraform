@@ -3,12 +3,12 @@
 ########################
 
 module "label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "dip-aleph-S3"
 }
 
 module "alephs3" {
-  source                 = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  source                 = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
   name                   = "dip-aleph-S3"
   expire_objects_enabled = "true"
   expiration_days        = "60"
@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "read" {
 }
 
 module "es-label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "dip-es-indexes"
 }
 
@@ -62,7 +62,7 @@ resource "aws_iam_policy" "es_read" {
 
 # Create API Credentials for Timdex (Heroku App) to read from Aleph index
 module "timdex-es-label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "timdex-es"
 }
 
@@ -125,12 +125,12 @@ resource "aws_elasticsearch_domain_policy" "default" {
 ###################
 
 module "mario-label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "mario"
 }
 
 module "ecr" {
-  source = "git::https://github.com/mitlibraries/tf-mod-ecr?ref=master"
+  source = "github.com/mitlibraries/tf-mod-ecr?ref=0.11"
   name   = "mario"
 }
 

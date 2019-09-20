@@ -1,5 +1,5 @@
 module "acm_request_certificate" {
-  source                            = "git::https://github.com/mitlibraries/tf-mod-acm-cert?ref=master"
+  source                            = "github.com/mitlibraries/tf-mod-acm-cert?ref=0.11"
   domain_name                       = "mitlib.net"
   ttl                               = "300"
   subject_alternative_names         = ["*.mitlib.net"]
