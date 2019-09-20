@@ -1,10 +1,10 @@
 module "label_geoblacklight" {
-  source = "git::https://github.com/MITLibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "geoblacklight"
 }
 
 module "geoblacklight_ecr" {
-  source = "git::https://github.com/MITLibraries/tf-mod-ecr?ref=master"
+  source = "github.com/mitlibraries/tf-mod-ecr?ref=0.11"
   name   = "geoblacklight"
 }
 

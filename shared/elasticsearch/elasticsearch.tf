@@ -1,5 +1,5 @@
 module "elasticsearch" {
-  source = "git::https://github.com/mitlibraries/tf-mod-aws-elasticsearch?ref=master"
+  source = "github.com/mitlibraries/tf-mod-aws-elasticsearch?ref=0.11"
   name   = "elasticsearch"
 
   instance_count                     = "${var.instance_count}"

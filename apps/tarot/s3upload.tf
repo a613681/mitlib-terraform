@@ -1,11 +1,11 @@
 module "tarot_upload" {
-  source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
   name               = "tarot-upload"
   versioning_enabled = "true"
 }
 
 module "tarot_label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "tarot-label"
 }
 

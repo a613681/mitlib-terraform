@@ -1,5 +1,5 @@
 module "label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "document-services"
 }
 
@@ -28,7 +28,7 @@ resource "aws_security_group" "default" {
 # Create an S3 Bucket to store MIT cert and key, and attach to beanstalk instance profile for access
 
 module "s3_cert_store" {
-  source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
   name               = "document-services-certstore"
   versioning_enabled = "false"
 }
@@ -39,7 +39,7 @@ resource "aws_iam_role_policy_attachment" "default_ro" {
 }
 
 module "rds_docsvcs" {
-  source                      = "git::https://github.com/mitlibraries/tf-mod-rds?ref=master"
+  source                      = "github.com/mitlibraries/tf-mod-rds?ref=0.11"
   engine                      = "mysql"
   engine_version              = "5.5.61"
   instance_class              = "db.t3.micro"
@@ -62,7 +62,7 @@ module "rds_docsvcs" {
 }
 
 module "eb_docsvcs" {
-  source = "git::https://github.com/mitlibraries/tf-mod-elasticbeanstalk-env?ref=master"
+  source = "github.com/mitlibraries/tf-mod-elasticbeanstalk-env?ref=0.11"
 
   app     = "${module.shared.docsvcs_app_name}"
   keypair = "mit-mjbernha"

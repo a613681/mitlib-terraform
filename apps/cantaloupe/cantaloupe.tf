@@ -1,11 +1,11 @@
 module "label" {
-  source = "git::https://github.com/MITLibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "cantaloupe"
 }
 
 # Create ECR repository
 module "ecr" {
-  source = "git::https://github.com/MITLibraries/tf-mod-ecr?ref=master"
+  source = "github.com/mitlibraries/tf-mod-ecr?ref=0.11"
   name   = "cantaloupe"
 }
 
@@ -39,7 +39,7 @@ resource "aws_route53_record" "dns" {
 
 # Create target group and ALB ingress rule for our container
 module "alb_ingress" {
-  source              = "git::https://github.com/MITLibraries/tf-mod-alb-ingress?ref=master"
+  source              = "github.com/mitlibraries/tf-mod-alb-ingress?ref=0.11"
   name                = "cantaloupe"
   vpc_id              = "${module.shared.vpc_id}"
   listener_arns       = ["${lookup(local.shared_alb_listeners, local.env)}"]
@@ -63,7 +63,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 
 # Create ECS Fargate Service
 module "fargate" {
-  source                    = "git::https://github.com/MITLibraries/tf-mod-alb-ecs-service-task?ref=master"
+  source                    = "github.com/mitlibraries/tf-mod-alb-ecs-service-task?ref=0.11"
   name                      = "cantaloupe"
   container_name            = "${module.label.name}"
   ecs_cluster_arn           = "${aws_ecs_cluster.ecs_cluster.arn}"

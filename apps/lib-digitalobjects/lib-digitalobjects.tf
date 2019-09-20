@@ -1,12 +1,12 @@
 # The SSL certificate was created manually (via MIT) and imported manually
 # We will investigate options for generating SSL certificates in the future
 module "label" {
-  source = "git::https://github.com/mitlibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "lib-digitalobjects"
 }
 
 module "lib-digitalobjects" {
-  source = "git::https://github.com/mitlibraries/tf-mod-cdn-s3?ref=master"
+  source = "github.com/mitlibraries/tf-mod-cdn-s3?ref=0.11"
   name   = "lib-digitalobjects"
 
   aliases = ["lib-digitalobjects-${terraform.workspace}.mitlib.net"]

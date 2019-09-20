@@ -5,7 +5,7 @@ resource "aws_route53_zone" "main_pub" {
 }
 
 module "prodvpc" {
-  source    = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
+  source    = "github.com/mitlibraries/tf-mod-shared-provider?ref=0.11"
   workspace = "prod"
 }
 
@@ -25,7 +25,7 @@ resource "aws_route53_zone" "main_priv" {
 
 #Associate Stage VPC with Internal DNS
 module "stagevpc" {
-  source    = "git::https://github.com/mitlibraries/tf-mod-shared-provider?ref=master"
+  source    = "github.com/mitlibraries/tf-mod-shared-provider?ref=0.11"
   workspace = "stage"
 }
 

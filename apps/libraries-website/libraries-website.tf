@@ -1,5 +1,5 @@
 module "label" {
-  source = "git::https://github.com/MITLibraries/tf-mod-name?ref=master"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
   name   = "libraries-website"
 }
 
@@ -44,7 +44,7 @@ resource "aws_security_group" "default" {
 }
 
 module "db" {
-  source             = "git::https://github.com/mitlibraries/tf-mod-rds?ref=master"
+  source             = "github.com/mitlibraries/tf-mod-rds?ref=0.11"
   engine             = "mariadb"
   engine_version     = "10.3.8"
   instance_class     = "db.t2.micro"

@@ -1,5 +1,5 @@
 module "website" {
-  source         = "git::https://github.com/mitlibraries/tf-mod-s3-website?ref=master"
+  source         = "github.com/mitlibraries/tf-mod-s3-website?ref=0.11"
   name           = "libstaff-archive"
   hostname       = "libstaff-archive.mitlib.net"
   parent_zone_id = "${module.shared.public_zoneid}"

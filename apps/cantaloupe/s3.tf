@@ -1,6 +1,6 @@
 # Create S3 Bucket for storing images and create IAM user
 module "s3store" {
-  source = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  source = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
   name   = "cantaloupe-storage"
 }
 
@@ -22,7 +22,7 @@ resource "aws_iam_access_key" "s3store" {
 
 # Create S3 Bucket for storing images and create IAM user
 module "s3cache" {
-  source             = "git::https://github.com/mitlibraries/tf-mod-s3-iam?ref=master"
+  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
   name               = "cantaloupe-cache"
   versioning_enabled = "false"
 
