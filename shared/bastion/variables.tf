@@ -11,3 +11,4 @@ variable "aws_region" {
 variable "logzio_token" {
   description = "Secret logz.io token for shipping logs to our account"
 }
+

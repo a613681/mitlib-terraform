@@ -1,6 +1,6 @@
 provider "aws" {
   version = "~> 2.0"
-  region  = "${var.aws_region}"
+  region  = var.aws_region
 }
 
 #Tell terraform to use the S3 bucket and DynamoDB we created
@@ -17,5 +17,6 @@ terraform {
 }
 
 module "shared" {
-  source = "github.com/mitlibraries/tf-mod-shared-provider?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-shared-provider?ref=0.12"
 }
+
