@@ -1,0 +1,35 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "${log_prefix}"
+      }
+    },
+    "environment": [
+      {"name": "AIRFLOW__CORE__DAGS_FOLDER", "value": "/airflow/dags"},
+      {"name": "AIRFLOW__CORE__LOAD_EXAMPLES", "value": "False"},
+      {"name": "AIRFLOW__CORE__EXECUTOR", "value": "CeleryExecutor"},
+      {"name": "AIRFLOW__WEBSERVER__RBAC", "value": "True"},
+      {"name": "AIRFLOW__API__AUTH_BACKEND", "value": "airflow.contrib.auth.backends.password_auth"},
+      {"name": "AIRFLOW__CELERY__WORKER_CONCURRENCY", "value": "8"},
+      {"name": "AIRFLOW__CELERY__BROKER_URL", "value": "${redis_node}"}
+    ],
+    "secrets": [
+      {"name": "AIRFLOW__CORE__SQL_ALCHEMY_CONN", "valueFrom": "${sqlalchemy_conn}"},
+      {"name": "AIRFLOW__CORE__FERNET_KEY", "valueFrom": "${fernet_key}"},
+      {"name": "AIRFLOW__CELERY__RESULT_BACKEND", "valueFrom": "${results_backend}"}
+    ],
+    "portMappings": [
+      {
+        "containerPort": 8080
+      }
+    ],
+    "command": ${jsonencode(command)},
+    "stopTimeout": ${force_kill}
+  }
+]
