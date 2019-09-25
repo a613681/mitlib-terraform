@@ -1,12 +1,15 @@
+configs = global $(wildcard shared/*) $(wildcard apps/*)
 
-modules = $(shell find . -type f -name "*.tf" -exec dirname {} \;|sort -u)
-all : fmt validate
-.PHONY: all
+all: $(configs)
 
-default: fmt
+$(configs): FORCE
+	## The grep bit can be removed once the full repo has been upgraded to 0.12.
+	## There is apparently a bug in 0.12 that prevents us from being able to run
+	## validate (https://github.com/hashicorp/terraform/issues/21761). For now,
+	## we'll disable the validate and at least run fmt.
+	cd $@ && \
+		if grep -q -P -r --exclude-dir '.*' "required_version\s*=\s*\">=\s*0\.12\""; \
+		then terraform fmt -check -recursive; fi
+		#then terraform init -backend=false && terraform validate; fi
 
-validate:
-	@for m in $(modules); do (terraform validate --check-variables=false "$$m" && echo "√ $$m") || exit 1 ; done
-
-fmt:
-	terraform fmt -check
+FORCE:
