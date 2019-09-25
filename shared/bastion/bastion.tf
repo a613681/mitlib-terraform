@@ -29,38 +29,41 @@ resource "aws_s3_bucket" "ssh_public_keys" {
 }
 EOF
 
-  tags = "${module.bastion.tags}"
+
+  tags = module.bastion.tags
 }
 
 resource "aws_s3_bucket_object" "ssh_public_keys" {
-  bucket = "${aws_s3_bucket.ssh_public_keys.bucket}"
+  bucket = aws_s3_bucket.ssh_public_keys.bucket
   key    = "${element(split(",", var.ssh_public_key_names), count.index)}.pub"
 
   # Make sure that you put files into correct location and name them accordingly (`public_keys/{keyname}.pub`)
-  content = "${file("pub_keys/${element(split(",", var.ssh_public_key_names), count.index)}.pub")}"
-  count   = "${length(split(",", var.ssh_public_key_names))}"
+  content = file(
+    "pub_keys/${element(split(",", var.ssh_public_key_names), count.index)}.pub",
+  )
+  count = length(split(",", var.ssh_public_key_names))
 
-  depends_on = ["aws_s3_bucket.ssh_public_keys"]
+  depends_on = [aws_s3_bucket.ssh_public_keys]
 }
 
 module "latest_ami" {
-  source = "github.com/mitlibraries/tf-mod-latest-ami?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-latest-ami?ref=0.12"
 }
 
 module "bastion" {
-  source                    = "github.com/mitlibraries/tf-mod-bastion-host?ref=0.11"
+  source                    = "github.com/mitlibraries/tf-mod-bastion-host?ref=0.12"
   name                      = "bastion"
   instance_type             = "t3.nano"
-  ami                       = "${module.latest_ami.ec2_linux_ami_id}"
-  region                    = "${var.aws_region}"
+  ami                       = module.latest_ami.ec2_linux_ami_id
+  region                    = var.aws_region
   key_name                  = "mit-mgraves"
   iam_instance_profile      = "s3_readonly-allow_associateaddress-${terraform.workspace}"
-  s3_bucket_name            = "${aws_s3_bucket.ssh_public_keys.bucket}"
-  vpc_id                    = "${module.shared.vpc_id}"
+  s3_bucket_name            = aws_s3_bucket.ssh_public_keys.bucket
+  vpc_id                    = module.shared.vpc_id
   allowed_cidr              = ["18.28.0.0/16", "18.30.0.0/16"]
-  logzio_token              = "${var.logzio_token}"
-  subnet_ids                = ["${module.shared.public_subnets}"]
-  eip                       = "${aws_eip.bastion.public_ip}"
+  logzio_token              = var.logzio_token
+  subnet_ids                = module.shared.public_subnets
+  eip                       = aws_eip.bastion.public_ip
   apply_changes_immediately = "true"
   keys_update_frequency     = "0 0 * * 0"
 
@@ -69,19 +72,21 @@ REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/documen
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 aws ec2 associate-address --region $REGION --instance-id $INSTANCE_ID --allocation-id ${aws_eip.bastion.id}
 EOF
+
 }
 
 #Create Route53 record
 resource "aws_eip" "bastion" {
   vpc = true
 
-  tags = "${module.bastion.tags}"
+  tags = module.bastion.tags
 }
 
 resource "aws_route53_record" "bastion" {
-  zone_id = "${module.shared.public_zoneid}"
+  zone_id = module.shared.public_zoneid
   name    = "${module.bastion.name}.mitlib.net"
   type    = "A"
   ttl     = "300"
-  records = ["${aws_eip.bastion.public_ip}"]
+  records = [aws_eip.bastion.public_ip]
 }
+
