@@ -1,15 +1,15 @@
 module "label" {
-  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
   name   = "author-lookup"
 }
 
 module "bucket" {
-  source = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.12"
   name   = "author-lookup"
 }
 
 module "secret" {
-  source = "github.com/mitlibraries/tf-mod-secrets?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-secrets?ref=0.12"
   name   = "author-lookup"
 }
 
@@ -127,7 +127,7 @@ data "aws_iam_policy_document" "assume" {
   statement {
     actions = ["sts:AssumeRole"]
 
-    principals = {
+    principals {
       type = "Service"
 
       identifiers = [
@@ -141,25 +141,25 @@ data "aws_iam_policy_document" "assume" {
 
 resource "aws_iam_role_policy" "default" {
   name   = "${module.label.name}-lambda"
-  role   = "${aws_iam_role.default.name}"
-  policy = "${data.aws_iam_policy_document.default.json}"
+  role   = aws_iam_role.default.name
+  policy = data.aws_iam_policy_document.default.json
 }
 
 resource "aws_iam_role" "default" {
   name               = "${module.label.name}-lambda"
-  assume_role_policy = "${data.aws_iam_policy_document.assume.json}"
+  assume_role_policy = data.aws_iam_policy_document.assume.json
   description        = "Role used by author lookup lambda"
-  tags               = "${module.label.tags}"
+  tags               = module.label.tags
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  role       = "${aws_iam_role.default.name}"
-  policy_arn = "${module.secret.read_policy}"
+  role       = aws_iam_role.default.name
+  policy_arn = module.secret.read_policy
 }
 
 resource "aws_iam_user" "default" {
   name = "${module.label.name}-deploy"
-  tags = "${module.label.tags}"
+  tags = module.label.tags
 }
 
 data "aws_iam_policy_document" "deploy" {
@@ -211,20 +211,21 @@ data "aws_iam_policy_document" "deploy" {
 
 resource "aws_iam_user_policy" "deploy" {
   name   = "${module.label.name}-deploy"
-  policy = "${data.aws_iam_policy_document.deploy.json}"
-  user   = "${aws_iam_user.default.name}"
+  policy = data.aws_iam_policy_document.deploy.json
+  user   = aws_iam_user.default.name
 }
 
 resource "aws_iam_user_policy_attachment" "default" {
-  user       = "${aws_iam_user.default.name}"
-  policy_arn = "${module.bucket.readwrite_arn}"
+  user       = aws_iam_user.default.name
+  policy_arn = module.bucket.readwrite_arn
 }
 
 resource "aws_iam_user_policy_attachment" "deploy" {
-  user       = "${aws_iam_user.default.name}"
-  policy_arn = "${module.shared.deploy_rw_arn}"
+  user       = aws_iam_user.default.name
+  policy_arn = module.shared.deploy_rw_arn
 }
 
 resource "aws_iam_access_key" "default" {
-  user = "${aws_iam_user.default.name}"
+  user = aws_iam_user.default.name
 }
+
