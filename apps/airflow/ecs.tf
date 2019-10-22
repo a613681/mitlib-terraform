@@ -14,6 +14,13 @@ locals {
     stage = module.shared.alb_restricted_sgid
     prod  = module.shared.alb_public_sgid
   }
+
+  network_config = {
+    "awsvpcConfigation" = {
+      "subnets"        = module.shared.private_subnets,
+      "securityGroups" = aws_security_group.airflow_tasks.id
+    }
+  }
 }
 
 module "ecr" {
@@ -127,12 +134,15 @@ resource "aws_ecs_task_definition" "web" {
       "force_kill"      = 30
       "redis_node"      = "redis://${aws_elasticache_cluster.redis.cache_nodes.0.address}:${aws_elasticache_cluster.redis.cache_nodes.0.port}"
       "results_backend" = aws_ssm_parameter.results_backend.arn
+      "network_config"  = local.network_config
+      "cluster"         = aws_ecs_cluster.default.name
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
+  task_role_arn            = aws_iam_role.airflow_task.arn
   network_mode             = "awsvpc"
   cpu                      = 256
-  memory                   = 512
+  memory                   = 1024
 }
 
 resource "aws_ecs_service" "web" {
@@ -172,9 +182,12 @@ resource "aws_ecs_task_definition" "scheduler" {
       "force_kill"      = 30
       "redis_node"      = "redis://${aws_elasticache_cluster.redis.cache_nodes.0.address}:${aws_elasticache_cluster.redis.cache_nodes.0.port}"
       "results_backend" = aws_ssm_parameter.results_backend.arn
+      "network_config"  = local.network_config
+      "cluster"         = aws_ecs_cluster.default.name
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
+  task_role_arn            = aws_iam_role.airflow_task.arn
   network_mode             = "awsvpc"
   cpu                      = 256
   memory                   = 512
@@ -191,6 +204,10 @@ resource "aws_ecs_service" "scheduler" {
   network_configuration {
     subnets         = module.shared.private_subnets
     security_groups = [aws_security_group.airflow.id]
+  }
+
+  lifecycle {
+    ignore_changes = ["desired_count"]
   }
 }
 
@@ -211,12 +228,15 @@ resource "aws_ecs_task_definition" "worker" {
       "force_kill"      = 120
       "redis_node"      = "redis://${aws_elasticache_cluster.redis.cache_nodes.0.address}:${aws_elasticache_cluster.redis.cache_nodes.0.port}"
       "results_backend" = aws_ssm_parameter.results_backend.arn
+      "network_config"  = local.network_config
+      "cluster"         = aws_ecs_cluster.default.name
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
+  task_role_arn            = aws_iam_role.airflow_task.arn
   network_mode             = "awsvpc"
   cpu                      = 256
-  memory                   = 512
+  memory                   = 1024
 }
 
 resource "aws_ecs_service" "worker" {
@@ -231,4 +251,46 @@ resource "aws_ecs_service" "worker" {
     subnets         = module.shared.private_subnets
     security_groups = [aws_security_group.airflow.id]
   }
+
+  lifecycle {
+    ignore_changes = ["desired_count"]
+  }
+}
+
+# Note that the role_arn in the aws_appautoscaling_target is currently
+# broken: https://github.com/terraform-providers/terraform-provider-aws/issues/5023
+resource "aws_appautoscaling_target" "worker" {
+  max_capacity       = 2
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.default.name}/${aws_ecs_service.worker.name}"
+  role_arn           = aws_iam_role.ecs_autoscale.arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "worker" {
+  name               = module.label.name
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.worker.resource_id
+  scalable_dimension = aws_appautoscaling_target.worker.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.worker.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value       = 75
+    scale_in_cooldown  = 60
+    scale_out_cooldown = 180
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+  }
+}
+
+###==- Airflow tasks -==###
+## These resources are for Airflow task containers
+resource "aws_security_group" "airflow_tasks" {
+  name        = "${module.label.name}-tasks"
+  tags        = module.label.tags
+  description = "Airflow task security group"
+  vpc_id      = module.shared.vpc_id
 }
