@@ -19,6 +19,11 @@ resource "aws_iam_user_policy_attachment" "airflow_deploy_ecr" {
   policy_arn = module.ecr.policy_readwrite_arn
 }
 
+resource "aws_iam_user_policy_attachment" "oaiharvester_deploy_ecr" {
+  user       = aws_iam_user.deploy.name
+  policy_arn = module.oaiharvester_ecr.policy_readwrite_arn
+}
+
 resource "aws_iam_policy" "airflow_deploy_ecs" {
   policy = data.aws_iam_policy_document.airflow_deploy_ecs.json
 }

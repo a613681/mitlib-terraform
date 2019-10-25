@@ -32,6 +32,18 @@ resource "aws_iam_access_key" "default" {
   user = aws_iam_user.default.name
 }
 
+####################################
+### Bucket for ASpace harvesting ###
+####################################
+
+module "aspace_s3" {
+  source                 = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.12"
+  name                   = "aspace-oai-s3"
+  expire_objects_enabled = "true"
+  expiration_days        = "60"
+}
+
+
 ################################
 ### Timdex ES read-only user ###
 ################################
@@ -43,6 +55,7 @@ data "aws_iam_policy_document" "read" {
 
     resources = [
       "${module.shared.es_arn}/aleph*",
+      "${module.shared.es_arn}/aspace*",
       "${module.shared.es_arn}/production*",
       "${module.shared.es_arn}/timdex*",
     ]

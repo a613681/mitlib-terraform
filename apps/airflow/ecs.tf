@@ -16,11 +16,24 @@ locals {
   }
 
   network_config = {
-    "awsvpcConfigation" = {
+    "awsvpcConfiguration" = {
       "subnets"        = module.shared.private_subnets,
-      "securityGroups" = aws_security_group.airflow_tasks.id
+      "securityGroups" = [aws_security_group.airflow_tasks.id]
     }
   }
+
+  mario_images = {
+    stage = "arn:aws:ecr:us-east-1:672626379771:repository/mario-stage"
+    prod  = "arn:aws:ecr:us-east-1:672626379771:repository/mario-prod"
+  }
+
+  aspace_buckets = {
+    stage = "arn:aws:s3:::aspace-oai-s3-stage"
+    prod  = "arn:aws:s3:::aspace-oai-s3-prod"
+  }
+
+  mario  = lookup(local.mario_images, local.env)
+  aspace = lookup(local.aspace_buckets, local.env)
 }
 
 module "ecr" {
@@ -259,6 +272,7 @@ resource "aws_ecs_service" "worker" {
 
 # Note that the role_arn in the aws_appautoscaling_target is currently
 # broken: https://github.com/terraform-providers/terraform-provider-aws/issues/5023
+# Remove the lifecyle block when this bug is fixed.
 resource "aws_appautoscaling_target" "worker" {
   max_capacity       = 2
   min_capacity       = 1
@@ -266,6 +280,10 @@ resource "aws_appautoscaling_target" "worker" {
   role_arn           = aws_iam_role.ecs_autoscale.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  lifecycle {
+    ignore_changes = ["role_arn"]
+  }
 }
 
 resource "aws_appautoscaling_policy" "worker" {
@@ -293,4 +311,11 @@ resource "aws_security_group" "airflow_tasks" {
   tags        = module.label.tags
   description = "Airflow task security group"
   vpc_id      = module.shared.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }

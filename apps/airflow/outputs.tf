@@ -18,3 +18,8 @@ output "secret_access_key" {
   description = "Secret key for deploy user"
   sensitive   = true
 }
+
+output "oaiharvester_ecr_url" {
+  value       = module.oaiharvester_ecr.registry_url
+  description = "OAI Harvester ECR URL"
+}

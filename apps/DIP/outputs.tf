@@ -32,3 +32,7 @@ output "timdex_access_key_id" {
   description = "ID for timdex user."
 }
 
+output "aspace_s3_bucket" {
+  value       = module.aspace_s3.bucket_arn
+  description = "ARN for ASpace harvesting bucket."
+}
