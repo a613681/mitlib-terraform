@@ -24,7 +24,8 @@
       {"name": "AIRFLOW__CELERY__BROKER_URL", "value": "${redis_node}"},
       {"name": "AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT", "value": "False"},
       {"name": "ECS_NETWORK_CONFIG", "value": "${base64encode(jsonencode(network_config))}"},
-      {"name": "ECS_CLUSTER", "value": "${cluster}"}
+      {"name": "ECS_CLUSTER", "value": "${cluster}"},
+      {"name": "ES_URL", "value": "${es_url}"}
     ],
     "secrets": [
       {"name": "AIRFLOW__CORE__SQL_ALCHEMY_CONN", "valueFrom": "${sqlalchemy_conn}"},

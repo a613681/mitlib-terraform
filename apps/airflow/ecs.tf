@@ -23,8 +23,8 @@ locals {
   }
 
   mario_images = {
-    stage = "arn:aws:ecr:us-east-1:672626379771:repository/mario-stage"
-    prod  = "arn:aws:ecr:us-east-1:672626379771:repository/mario-prod"
+    stage = "672626379771.dkr.ecr.us-east-1.amazonaws.com/mario-stage"
+    prod  = "672626379771.dkr.ecr.us-east-1.amazonaws.com/mario-prod"
   }
 
   aspace_buckets = {
@@ -149,6 +149,7 @@ resource "aws_ecs_task_definition" "web" {
       "results_backend" = aws_ssm_parameter.results_backend.arn
       "network_config"  = local.network_config
       "cluster"         = aws_ecs_cluster.default.name
+      "es_url"          = "https://${module.shared.es_endpoint}"
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
@@ -197,6 +198,7 @@ resource "aws_ecs_task_definition" "scheduler" {
       "results_backend" = aws_ssm_parameter.results_backend.arn
       "network_config"  = local.network_config
       "cluster"         = aws_ecs_cluster.default.name
+      "es_url"          = "https://${module.shared.es_endpoint}"
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
@@ -243,6 +245,7 @@ resource "aws_ecs_task_definition" "worker" {
       "results_backend" = aws_ssm_parameter.results_backend.arn
       "network_config"  = local.network_config
       "cluster"         = aws_ecs_cluster.default.name
+      "es_url"          = "https://${module.shared.es_endpoint}"
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
