@@ -19,6 +19,17 @@ data "aws_iam_policy_document" "aspace_rw" {
   }
 }
 
+resource "aws_iam_role_policy_attachment" "es_read" {
+  role       = aws_iam_role.workflow_task.name
+  policy_arn = module.shared.es_read_policy_arn
+}
+
+resource "aws_iam_role_policy_attachment" "es_write" {
+  role       = aws_iam_role.workflow_task.name
+  policy_arn = module.shared.es_write_policy_arn
+}
+
+###==- Workflow task definitions -==###
 resource "aws_ecs_task_definition" "example" {
   family = "${module.label.name}-example-task"
   tags   = module.label.tags
