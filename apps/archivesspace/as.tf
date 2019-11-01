@@ -30,3 +30,10 @@ resource "aws_route53_record" "emmastaff" {
   records = ["as-prod-general-app4.LYRTECH.ORG"]
 }
 
+resource "aws_route53_record" "as_private" {
+  name    = "archivesspace"
+  ttl     = 3600
+  type    = "CNAME"
+  zone_id = module.shared.private_zoneid
+  records = ["as-prod-general-app4.LYRTECH.ORG"]
+}
