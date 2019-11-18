@@ -4,7 +4,7 @@ resource "aws_db_instance" "default" {
   engine_version              = "11.1"
   allocated_storage           = 10
   storage_type                = "gp2"
-  instance_class              = "db.t3.micro"
+  instance_class              = var.postgres_instance_type
   name                        = "airflow"
   username                    = var.postgres_username
   password                    = var.postgres_password
