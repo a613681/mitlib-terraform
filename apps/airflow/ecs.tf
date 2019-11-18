@@ -3,16 +3,16 @@ locals {
 
   shared_alb_dns = {
     stage = module.shared.alb_restricted_dnsname
-    prod  = module.shared.alb_public_dnsname
+    prod  = module.shared.alb_restricted_dnsname
   }
   shared_alb_listeners = {
     stage = module.shared.alb_restricted_https_listener_arn
-    prod  = module.shared.alb_public_https_listener_arn
+    prod  = module.shared.alb_restricted_https_listener_arn
   }
 
   shared_alb_sgids = {
     stage = module.shared.alb_restricted_sgid
-    prod  = module.shared.alb_public_sgid
+    prod  = module.shared.alb_restricted_sgid
   }
 
   network_config = {
@@ -164,7 +164,7 @@ resource "aws_ecs_service" "web" {
   tags            = module.label.tags
   cluster         = aws_ecs_cluster.default.id
   task_definition = aws_ecs_task_definition.web.arn
-  desired_count   = 1
+  desired_count   = 0
   launch_type     = "FARGATE"
 
   load_balancer {
@@ -176,6 +176,10 @@ resource "aws_ecs_service" "web" {
   network_configuration {
     subnets         = module.shared.private_subnets
     security_groups = [aws_security_group.airflow.id]
+  }
+
+  lifecycle {
+    ignore_changes = ["desired_count"]
   }
 }
 
@@ -213,7 +217,7 @@ resource "aws_ecs_service" "scheduler" {
   tags            = module.label.tags
   cluster         = aws_ecs_cluster.default.id
   task_definition = aws_ecs_task_definition.scheduler.arn
-  desired_count   = 1
+  desired_count   = 0
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -260,7 +264,7 @@ resource "aws_ecs_service" "worker" {
   tags            = module.label.tags
   cluster         = aws_ecs_cluster.default.id
   task_definition = aws_ecs_task_definition.worker.arn
-  desired_count   = 1
+  desired_count   = 0
   launch_type     = "FARGATE"
 
   network_configuration {
