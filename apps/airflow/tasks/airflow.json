@@ -25,7 +25,8 @@
       {"name": "AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT", "value": "False"},
       {"name": "ECS_NETWORK_CONFIG", "value": "${base64encode(jsonencode(network_config))}"},
       {"name": "ECS_CLUSTER", "value": "${cluster}"},
-      {"name": "ES_URL", "value": "${es_url}"}
+      {"name": "ES_URL", "value": "${es_url}"},
+      {"name": "AIRFLOW_ENVIRONMENT", "value": "${environment}"}
     ],
     "secrets": [
       {"name": "AIRFLOW__CORE__SQL_ALCHEMY_CONN", "valueFrom": "${sqlalchemy_conn}"},
