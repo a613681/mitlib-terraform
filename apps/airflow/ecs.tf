@@ -245,7 +245,7 @@ resource "aws_ecs_task_definition" "worker" {
       "log_prefix"      = "worker"
       "sqlalchemy_conn" = aws_ssm_parameter.sqlalchemy_conn.arn
       "fernet_key"      = aws_ssm_parameter.fernet_key.arn
-      "command"         = ["worker"]
+      "command"         = ["worker", "--skip_serve_logs"]
       "force_kill"      = 120
       "redis_node"      = "redis://${aws_elasticache_cluster.redis.cache_nodes.0.address}:${aws_elasticache_cluster.redis.cache_nodes.0.port}"
       "results_backend" = aws_ssm_parameter.results_backend.arn
