@@ -29,6 +29,19 @@ resource "aws_iam_role_policy_attachment" "es_write" {
   policy_arn = module.shared.es_write_policy_arn
 }
 
+resource "aws_iam_role_policy" "slingshot" {
+  name   = "${module.label.name}-slingshot"
+  role   = aws_iam_role.workflow_task.name
+  policy = data.aws_iam_policy_document.slingshot.json
+}
+
+data "aws_iam_policy_document" "slingshot" {
+  statement {
+    actions   = ["s3:GetObject", "s3:ListBucket"]
+    resources = [local.dip, "${local.dip}/*"]
+  }
+}
+
 ###==- Workflow task definitions -==###
 resource "aws_ecs_task_definition" "example" {
   family = "${module.label.name}-example-task"

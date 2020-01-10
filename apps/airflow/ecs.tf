@@ -32,8 +32,14 @@ locals {
     prod  = "arn:aws:s3:::aspace-oai-s3-prod"
   }
 
+  dip_buckets = {
+    stage = "arn:aws:s3:::dip-aleph-s3-stage"
+    prod  = "arn:aws:s3:::dip-aleph-s3-prod"
+  }
+
   mario  = lookup(local.mario_images, local.env)
   aspace = lookup(local.aspace_buckets, local.env)
+  dip    = lookup(local.dip_buckets, local.env)
 }
 
 module "ecr" {

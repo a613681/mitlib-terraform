@@ -96,6 +96,12 @@ resource "aws_iam_role_policy" "airflow_aspace_rw" {
   policy = data.aws_iam_policy_document.aspace_rw.json
 }
 
+resource "aws_iam_role_policy" "airflow_slingshot" {
+  name   = "${module.label.name}-airflow-slingshot"
+  role   = aws_iam_role.airflow_task.name
+  policy = data.aws_iam_policy_document.slingshot.json
+}
+
 data "aws_iam_policy_document" "task_role" {
   statement {
     actions   = ["s3:*Object", "s3:*ObjectAcl"]
