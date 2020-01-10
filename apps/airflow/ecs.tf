@@ -151,6 +151,7 @@ resource "aws_ecs_task_definition" "web" {
       "cluster"         = aws_ecs_cluster.default.name
       "es_url"          = "https://${module.shared.es_endpoint}"
       "environment"     = local.env
+      "task_logs"       = "s3://${aws_s3_bucket.logging.id}"
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
@@ -205,6 +206,7 @@ resource "aws_ecs_task_definition" "scheduler" {
       "cluster"         = aws_ecs_cluster.default.name
       "es_url"          = "https://${module.shared.es_endpoint}"
       "environment"     = local.env
+      "task_logs"       = "s3://${aws_s3_bucket.logging.id}"
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
@@ -253,6 +255,7 @@ resource "aws_ecs_task_definition" "worker" {
       "cluster"         = aws_ecs_cluster.default.name
       "es_url"          = "https://${module.shared.es_endpoint}"
       "environment"     = local.env
+      "task_logs"       = "s3://${aws_s3_bucket.logging.id}"
   })
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.airflow.arn
