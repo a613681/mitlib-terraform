@@ -15,7 +15,7 @@
       {"name": "AIRFLOW__CORE__LOAD_EXAMPLES", "value": "False"},
       {"name": "AIRFLOW__CORE__EXECUTOR", "value": "CeleryExecutor"},
       {"name": "AIRFLOW__CORE__REMOTE_LOGGING", "value": "True"},
-      {"name": "AIRFLOW__CORE__REMOTE_BASE_LOG_FOLDER", "value": "s3://airflow-stage-logging"},
+      {"name": "AIRFLOW__CORE__REMOTE_BASE_LOG_FOLDER", "value": "${task_logs}"},
       {"name": "AIRFLOW__CORE__ENCRYPT_S3_LOGS", "value": "False"},
       {"name": "AIRFLOW__WEBSERVER__RBAC", "value": "True"},
       {"name": "AIRFLOW__WEBSERVER__WORKERS", "value": "2"},
