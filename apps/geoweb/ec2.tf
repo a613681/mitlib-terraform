@@ -1,3 +1,7 @@
+data "aws_security_group" "airflow" {
+  name = "airflow-${local.env}-tasks"
+}
+
 resource "aws_security_group" "geoserver" {
   name        = "geoserver-${module.label.name}"
   description = "Security group associated with GeoServer instance."
@@ -33,10 +37,13 @@ resource "aws_security_group" "solr" {
   tags        = "${module.label.tags}"
 
   ingress {
-    from_port       = 8983
-    to_port         = 8983
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.geoblacklight.id}"]
+    from_port = 8983
+    to_port   = 8983
+    protocol  = "tcp"
+    security_groups = [
+      "${aws_security_group.geoblacklight.id}",
+      "${data.aws_security_group.airflow.id}",
+    ]
   }
 
   ingress {
