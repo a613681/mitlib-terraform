@@ -217,7 +217,7 @@ resource "aws_cloudwatch_event_rule" "default" {
   name                = "${module.label_slingshot.name}"
   description         = "Slingshot data load"
   is_enabled          = true
-  schedule_expression = "cron(0 12 * * ? *)"
+  schedule_expression = "cron(0 12-22/2 ? * MON-FRI *)"
   tags                = "${module.label_slingshot.tags}"
 }
 
