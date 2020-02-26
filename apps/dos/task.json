@@ -1,0 +1,28 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "dos"
+      }
+    },
+    "environment": [
+      {"name": "SPRING_DATASOURCE_URL", "value": "jdbc:postgresql://${postgres_host}/${postgres_db}"},
+      {"name": "SPRING_DATASOURCE_USERNAME", "value": "${postgres_username}"},
+      {"name": "CONFIG_STORAGE", "value": "s3"},
+      {"name": "SPRING_PROFILES_ACTIVE", "value": "stage"}
+    ],
+    "secrets": [
+      {"name": "SPRING_DATASOURCE_PASSWORD", "valueFrom": "${postgres_password}"}
+    ],
+    "portMappings": [
+      {
+        "containerPort": 8080
+      }
+    ]
+  }
+]
