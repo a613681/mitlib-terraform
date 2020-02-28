@@ -33,4 +33,3 @@ resource "aws_route53_zone_association" "stage" {
   zone_id = aws_route53_zone.main_priv.zone_id
   vpc_id  = module.stagevpc.vpc_id
 }
-
