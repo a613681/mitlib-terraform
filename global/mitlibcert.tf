@@ -11,4 +11,3 @@ module "acm_request_certificate" {
     stage     = terraform.workspace
   }
 }
-

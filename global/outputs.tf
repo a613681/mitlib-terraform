@@ -33,3 +33,17 @@ output "docsvcs_beanstalk_name" {
   value       = aws_elastic_beanstalk_application.docsvcs.name
 }
 
+# The IAM accounts that have also been given membership in the administrators
+# group. If we decide to use IAM groups (rather than policies) for some reason
+# for additional groups besides administrators, we should modify this code to
+# output the groups each account is given membership in.
+output "admin_accounts" {
+  description = "Names of the administrator accounts"
+  value       = aws_iam_group_membership.admins.users
+}
+
+# The IAM user accounts created.
+output "user_account_arns" {
+  description = "ARNs of the user accounts"
+  value       = aws_iam_user.users.*.arn
+}
