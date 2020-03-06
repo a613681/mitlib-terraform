@@ -1,11 +1,11 @@
 module "tarot_upload" {
-  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
+  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.12"
   name               = "tarot-upload"
   versioning_enabled = "true"
 }
 
 module "tarot_label" {
-  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
   name   = "tarot-label"
 }
 
@@ -35,9 +35,10 @@ resource "aws_iam_role" "tarot_upload" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "tarot_upload" {
-  role       = "${aws_iam_role.tarot_upload.name}"
-  policy_arn = "${module.tarot_upload.admin_arn}"
+  role       = aws_iam_role.tarot_upload.name
+  policy_arn = module.tarot_upload.admin_arn
 }
