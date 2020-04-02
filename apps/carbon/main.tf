@@ -10,7 +10,7 @@ provider "aws" {
 }
 
 terraform {
-  required_version = ">= 0.11.10"
+  required_version = ">= 0.12"
 
   backend "s3" {
     region         = "us-east-1"
@@ -30,5 +30,5 @@ data "aws_vpc" "mit_net_vpc" {
 }
 
 module "shared" {
-  source = "github.com/mitlibraries/tf-mod-shared-provider?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-shared-provider?ref=0.12"
 }
