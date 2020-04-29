@@ -1,0 +1,9 @@
+---
+
+##--  for test --#
+  - name: tree installed
+    apt: pkg=tree state=latest
+
+##--- Required for author_lookup ---##
+  - name: install libaio1
+    apt: pkg=libaio1 state=present
