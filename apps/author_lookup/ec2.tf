@@ -1,6 +1,6 @@
 module "label" {
   source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
-  name   = var.app_name
+  name = "author_lookup"
 }
 
 resource "aws_security_group" "default" {

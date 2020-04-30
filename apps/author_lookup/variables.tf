@@ -9,11 +9,6 @@ variable "vpc_id" {
   description = "VPC to build infrastructure in"
 }
 
-variable "app_name" {
-  type    = string
-  default = ""
-}
-
 variable "ec2_subnet" {
   type        = string
   description = "Subnet to use for ec2 host"
