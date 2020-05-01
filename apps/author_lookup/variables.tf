@@ -3,7 +3,6 @@ variable "region" {
   default = "us-east-1"
 }
 
-# Global variables
 variable "vpc_id" {
   type        = string
   description = "VPC to build infrastructure in"
@@ -39,7 +38,6 @@ variable "key_name" {
 variable "volume_size" {
   description = "volume_size"
   type        = number
-  default     = "8"
 }
 
 variable "volume_type" {
@@ -91,6 +89,12 @@ variable "private_key_path" {
   default     = ""
 }
 
+variable "records" {
+  type        = string
+  default     = ""
+  description = "DNS record to be created"
+}
+
 variable "provision_log" {
   default = ""
 }
@@ -99,6 +103,4 @@ variable "playbooks" {
   default = ""
 }
 
-# variable "private_key" {
-#   default = ""
-# }
+

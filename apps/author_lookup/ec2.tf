@@ -24,7 +24,6 @@ resource "aws_security_group" "default" {
   }
 }
 
-###--- start of aws_instance ---###
 resource "aws_instance" "default" {
   instance_type = var.instance_type
   ami           = var.ami
@@ -52,33 +51,31 @@ resource "aws_instance" "default" {
       host        = aws_instance.default.private_ip
     }
   }
-  ###--- testing copy file ---###
-  provisioner "file" {
-    source      = "files/user_data.sh"
-    destination = "/home/${var.ssh_user}/user_data.sh"
-    connection {
-      type        = "ssh"
-      user        = var.ssh_user
-      private_key = file(var.private_key_path)
-      host        = aws_instance.default.private_ip
-    }
-  }
 
   provisioner "local-exec" {
     command = "echo ${aws_instance.default.private_ip}"
   }
 
   provisioner "local-exec" {
-    command = "echo ${aws_instance.default.public_ip}"
-  }
-
-
-  provisioner "local-exec" {
     command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/provision.yaml | tee -a provision.log"
   }
-
 }
-###--- end of aws_instance ---###
+
+resource "aws_route53_record" "author_lookup_private" {
+  name    = module.label.name
+  zone_id = module.shared.private_zoneid
+  type    = "A"
+  ttl     = "60"
+  records = aws_instance.default.*.private_ip
+}
+
+resource "aws_route53_record" "author_lookup_public" {
+  name    = module.label.name
+  zone_id = module.shared.public_zoneid
+  type    = "A"
+  ttl     = "60"
+  records = aws_instance.default.*.private_ip
+}
 
 resource "aws_iam_role" "role" {
   name               = "${module.label.name}_role"
