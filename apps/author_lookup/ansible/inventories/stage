@@ -1,0 +1,5 @@
+[author_lookup]
+author-lookup-stage.mitlib.net ansible_user=ubuntu
+
+[stage:children]
+author_lookup

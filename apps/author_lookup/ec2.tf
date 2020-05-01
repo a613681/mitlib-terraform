@@ -1,6 +1,6 @@
 module "label" {
   source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
-  name = "author_lookup"
+  name   = "author_lookup"
 }
 
 resource "aws_security_group" "default" {
@@ -9,9 +9,9 @@ resource "aws_security_group" "default" {
   tags        = module.label.tags
   vpc_id      = var.vpc_id
   ingress {
-    from_port = var.ssh_port
-    to_port   = var.ssh_port
-    protocol  = "tcp"
+    from_port   = var.ssh_port
+    to_port     = var.ssh_port
+    protocol    = "tcp"
     cidr_blocks = ["18.0.0.0/11", "10.0.0.0/8"]
 
   }
@@ -74,7 +74,7 @@ resource "aws_instance" "default" {
 
 
   provisioner "local-exec" {
-    command = "ansible-playbook -i '${aws_instance.default.private_ip},' --private-key '${var.private_key_path}' --user '${var.ssh_user}'  '${var.playbooks}'/provision.yaml | tee -a '${var.provision_log}' "
+    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/provision.yaml | tee -a provision.log"
   }
 
 }
@@ -113,7 +113,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/files/user_data.sh")
 
   vars = {
-    s3_bucket_pubkeys              = var.s3_bucket_pubkeys
+    s3_bucket_pubkeys           = var.s3_bucket_pubkeys
     s3_bucket_uri               = var.s3_bucket_uri
     ssh_user                    = var.ssh_user
     additional_user_data_script = var.additional_user_data_script
