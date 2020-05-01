@@ -61,14 +61,6 @@ resource "aws_instance" "default" {
   }
 }
 
-resource "aws_route53_record" "author_lookup_private" {
-  name    = module.label.name
-  zone_id = module.shared.private_zoneid
-  type    = "A"
-  ttl     = "60"
-  records = aws_instance.default.*.private_ip
-}
-
 resource "aws_route53_record" "author_lookup_public" {
   name    = module.label.name
   zone_id = module.shared.public_zoneid
