@@ -1,5 +1,8 @@
 [author_lookup]
-author-lookup-stage.mitlib.net ansible_user=ubuntu
+
+18.23.238.146 ansible_user=ubuntu
 
 [stage:children]
-author_lookup
+
+18.23.238.146
+

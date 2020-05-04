@@ -9,14 +9,14 @@ resource "null_resource" "ansible_inventory" {
     command = "echo \"[author_lookup]\n\" > ansible/inventories/${terraform.workspace}"
   }
   provisioner "local-exec" {
-    command = "echo \"aws_instance.default.private_ip)} ansible_user=ubuntu\n\" >> ansible/inventories/${terraform.workspace}"
+    command = "echo \"${aws_instance.default.private_ip} ansible_user=ubuntu\n\" >> ansible/inventories/${terraform.workspace}"
   }
 
   provisioner "local-exec" {
-    command = "echo \"[stage:children]\n\" > ansible/inventories/${terraform.workspace}"
+    command = "echo \"[stage:children]\n\" >> ansible/inventories/${terraform.workspace}"
   }
   provisioner "local-exec" {
-    command = "echo \"aws_instance.default.private_ip)}\n\" >> ansible/inventories/${terraform.workspace}"
+    command = "echo \"${aws_instance.default.private_ip}\n\" >> ansible/inventories/${terraform.workspace}"
   }
   provisioner "local-exec" {
     command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/provision.yaml | tee -a provision.log"
@@ -24,11 +24,11 @@ resource "null_resource" "ansible_inventory" {
 }
 
 resource "aws_route53_record" "author_lookup_public" {
-  name       = module.label.name
-  zone_id    = module.shared.public_zoneid
-  type       = "A"
-  ttl        = "60"
-  records    = aws_instance.default.*.private_ip
+  name    = module.label.name
+  zone_id = module.shared.public_zoneid
+  type    = "A"
+  ttl     = "60"
+  records = aws_instance.default.*.private_ip
 }
 
 resource "aws_security_group" "default" {
