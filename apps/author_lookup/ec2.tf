@@ -11,12 +11,11 @@ resource "null_resource" "ansible_inventory" {
   provisioner "local-exec" {
     command = "echo \"${aws_instance.default.private_ip} ansible_user=ubuntu\n\" >> ansible/inventories/${terraform.workspace}"
   }
-
   provisioner "local-exec" {
     command = "echo \"[stage:children]\n\" >> ansible/inventories/${terraform.workspace}"
   }
   provisioner "local-exec" {
-    command = "echo \"${aws_instance.default.private_ip}\n\" >> ansible/inventories/${terraform.workspace}"
+    command = "echo \"author_lookup\n\" >> ansible/inventories/${terraform.workspace}"
   }
   provisioner "local-exec" {
     command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/provision.yaml | tee -a provision.log"
