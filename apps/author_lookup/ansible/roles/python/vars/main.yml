@@ -1,0 +1,4 @@
+lib_bucket: deploy-mitlib-stage
+oracle_version: 18.3.0.0.0
+author_version: 1.1.0
+author_home: /opt/author-lookup

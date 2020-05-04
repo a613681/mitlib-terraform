@@ -18,7 +18,7 @@ resource "null_resource" "ansible_inventory" {
     command = "echo \"author_lookup\n\" >> ansible/inventories/${terraform.workspace}"
   }
   provisioner "local-exec" {
-    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/provision.yaml | tee -a provision.log"
+    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} -e \"aws_secret_arn=${aws_secretsmanager_secret.default.arn}\" ansible/provision.yaml | tee -a provision.log"
   }
 }
 
@@ -35,6 +35,7 @@ resource "aws_security_group" "default" {
   description = "${module.label.name} ec2 security group"
   tags        = module.label.tags
   vpc_id      = var.vpc_id
+
   ingress {
     from_port   = var.ssh_port
     to_port     = var.ssh_port
@@ -42,6 +43,13 @@ resource "aws_security_group" "default" {
     cidr_blocks = var.ingress_cidr_blocks
 
   }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -87,6 +95,11 @@ resource "aws_iam_role" "role" {
   name               = "${module.label.name}_role"
   assume_role_policy = data.template_file.assume_role_policy.rendered
   tags               = module.label.tags
+}
+
+resource "aws_secretsmanager_secret" "default" {
+  name = module.label.name
+  tags = module.label.tags
 }
 
 resource "aws_iam_role_policy" "get_pubkey_policy" {
@@ -137,13 +150,15 @@ data "template_file" "assume_role_policy" {
 
 data "template_file" "read_secrets_policy" {
   template = file("${path.module}/files/read_secrets_policy.json")
-
+  vars = {
+    secrets_arn = aws_secretsmanager_secret.default.arn
+  }
 }
 
 data "template_file" "s3_deploy_policy" {
   template = file("${path.module}/files/s3_deploy_policy.json")
 
   vars = {
-    s3_bucket_deploy = var.s3_bucket_deploy
+    s3_bucket_deploy = module.shared.deploy_bucket
   }
 }

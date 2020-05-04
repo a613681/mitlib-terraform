@@ -1,6 +1,12 @@
 ---
-
-
-- name: install libaio1
-  apt: pkg=libaio1 state=present
-
+- name: Add python repository
+  apt_repository:
+    repo: ppa:deadsnakes/ppa
+- name: Install system dependencies
+  apt: name={{ packages }} state=present
+  vars:
+    packages:
+      - libaio1
+      - python3-pip
+      - python3.7
+      - unzip

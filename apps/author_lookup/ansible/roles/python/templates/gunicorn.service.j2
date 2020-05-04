@@ -1,0 +1,21 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+Type=notify
+DynamicUser=yes
+RuntimeDirectory=gunicorn
+WorkingDirectory={{ author_home }}/author-lookup
+Environment=AWS_SECRET_ID={{ aws_secret_arn | default('') }}
+Environment=AWS_DEFAULT_REGION=us-east-1
+Environment=LD_LIBRARY_PATH=/usr/local/lib
+ExecStart={{ venv_path.stdout }}/bin/gunicorn -b 0.0.0.0:80 -w 2 dw_lookup.app:app
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

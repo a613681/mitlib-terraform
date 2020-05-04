@@ -1,0 +1,64 @@
+- name: Install base Python requirements
+  become: yes
+  pip:
+    name:
+      - boto3
+      - pipenv
+- name: Create app home
+  become: yes
+  file:
+    path: "{{ author_home }}"
+    state: directory
+    mode: "0755"
+    owner: ubuntu
+    group: ubuntu
+- name: Download Oracle client library
+  aws_s3:
+    bucket: "{{ lib_bucket }}"
+    object: instantclient-basiclite-linux.x64-{{ oracle_version }}dbru.zip
+    dest: "{{ author_home }}/instantclient-basiclite-linux.x64-{{ oracle_version }}dbru.zip"
+    mode: get
+    overwrite: never
+- name: Install Oracle client library
+  become: yes
+  unarchive:
+    src: "{{ author_home }}/instantclient-basiclite-linux.x64-{{ oracle_version }}dbru.zip"
+    remote_src: yes
+    dest: /usr/local/lib
+    extra_opts:
+      - -j
+- name: Download author-lookup release
+  unarchive:
+    src: https://github.com/MITLibraries/author-lookup/archive/v{{ author_version }}.tar.gz
+    dest: "{{ author_home }}"
+    remote_src: yes
+    creates: "{{ author_home }}/author-lookup-{{ author_version }}"
+- name: Symlink new app version
+  notify: Restart gunicorn
+  file:
+    src: "{{ author_home }}/author-lookup-{{ author_version }}"
+    dest: "{{ author_home }}/author-lookup"
+    state: link
+- name: Install dependencies
+  shell: pipenv install --python 3.7 --ignore-pipfile --deploy
+  args:
+    chdir: "{{ author_home }}/author-lookup"
+  environment:
+    PIPENV_VENV_IN_PROJECT: yes
+- name: Store virtualenv directory
+  shell: pipenv --venv
+  args:
+    chdir: "{{ author_home }}/author-lookup"
+  register: venv_path
+- name: Install unit file
+  become: yes
+  template:
+    src: gunicorn.service.j2
+    dest: /etc/systemd/system/gunicorn.service
+- name: Start service
+  become: yes
+  systemd:
+    name: gunicorn
+    enabled: yes
+    state: started
+    daemon_reload: yes

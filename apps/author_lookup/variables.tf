@@ -84,11 +84,6 @@ variable "s3_bucket_uri" {
   default     = ""
 }
 
-variable "s3_bucket_deploy" {
-  description = "S3 bucket deploy"
-  default     = ""
-}
-
 variable "private_key_path" {
   description = "Path to the private SSH key, used to access the instance."
   default     = ""
