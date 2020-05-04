@@ -13,6 +13,11 @@ variable "ec2_subnet" {
   description = "Subnet to use for ec2 host"
 }
 
+variable "ingress_cidr_blocks" {
+  type    = list(string)
+  default = []
+}
+
 variable "ssh_port" {
   description = "ssh access"
   type        = number
@@ -103,4 +108,8 @@ variable "playbooks" {
   default = ""
 }
 
-
+variable "dns_zone_id" {
+  type        = string
+  default     = ""
+  description = "The ID of the DNS Zone in Route53"
+}

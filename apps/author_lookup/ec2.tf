@@ -1,6 +1,34 @@
 module "label" {
   source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
-  name   = "author_lookup"
+  name   = "author-lookup"
+}
+
+resource "null_resource" "ansible_inventory" {
+  depends_on = [aws_instance.default]
+  provisioner "local-exec" {
+    command = "echo \"[author_lookup]\n\" > ansible/inventories/${terraform.workspace}"
+  }
+  provisioner "local-exec" {
+    command = "echo \"aws_instance.default.private_ip)} ansible_user=ubuntu\n\" >> ansible/inventories/${terraform.workspace}"
+  }
+
+  provisioner "local-exec" {
+    command = "echo \"[stage:children]\n\" > ansible/inventories/${terraform.workspace}"
+  }
+  provisioner "local-exec" {
+    command = "echo \"aws_instance.default.private_ip)}\n\" >> ansible/inventories/${terraform.workspace}"
+  }
+  provisioner "local-exec" {
+    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/provision.yaml | tee -a provision.log"
+  }
+}
+
+resource "aws_route53_record" "author_lookup_public" {
+  name       = module.label.name
+  zone_id    = module.shared.public_zoneid
+  type       = "A"
+  ttl        = "60"
+  records    = aws_instance.default.*.private_ip
 }
 
 resource "aws_security_group" "default" {
@@ -12,10 +40,9 @@ resource "aws_security_group" "default" {
     from_port   = var.ssh_port
     to_port     = var.ssh_port
     protocol    = "tcp"
-    cidr_blocks = ["18.0.0.0/11", "10.0.0.0/8"]
+    cidr_blocks = var.ingress_cidr_blocks
 
   }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -55,18 +82,6 @@ resource "aws_instance" "default" {
   provisioner "local-exec" {
     command = "echo ${aws_instance.default.private_ip}"
   }
-
-  provisioner "local-exec" {
-    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/provision.yaml | tee -a provision.log"
-  }
-}
-
-resource "aws_route53_record" "author_lookup_public" {
-  name    = module.label.name
-  zone_id = module.shared.public_zoneid
-  type    = "A"
-  ttl     = "60"
-  records = aws_instance.default.*.private_ip
 }
 
 resource "aws_iam_role" "role" {
