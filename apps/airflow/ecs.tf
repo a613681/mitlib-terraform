@@ -74,7 +74,7 @@ resource "aws_ssm_parameter" "fernet_key" {
 }
 
 resource "aws_security_group" "airflow" {
-  name        = "${module.label.name}"
+  name        = module.label.name
   tags        = module.label.tags
   description = "Airflow cluster"
   vpc_id      = module.shared.vpc_id
@@ -187,7 +187,7 @@ resource "aws_ecs_service" "web" {
   }
 
   lifecycle {
-    ignore_changes = ["desired_count"]
+    ignore_changes = [desired_count]
   }
 }
 
@@ -236,7 +236,7 @@ resource "aws_ecs_service" "scheduler" {
   }
 
   lifecycle {
-    ignore_changes = ["desired_count"]
+    ignore_changes = [desired_count]
   }
 }
 
@@ -285,7 +285,7 @@ resource "aws_ecs_service" "worker" {
   }
 
   lifecycle {
-    ignore_changes = ["desired_count"]
+    ignore_changes = [desired_count]
   }
 }
 
@@ -301,7 +301,7 @@ resource "aws_appautoscaling_target" "worker" {
   service_namespace  = "ecs"
 
   lifecycle {
-    ignore_changes = ["role_arn"]
+    ignore_changes = [role_arn]
   }
 }
 

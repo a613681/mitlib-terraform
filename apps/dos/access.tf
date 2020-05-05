@@ -74,7 +74,7 @@ resource "aws_iam_role" "ecs" {
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  role       = aws_iam_role.default.name
+  role       = aws_iam_role.ecs.name
   policy_arn = data.aws_iam_policy.ecs_exec.arn
 }
 
@@ -112,14 +112,14 @@ data "aws_iam_policy" "ecs_exec" {
 ##==-- Developer IAM S3 user permissions --==##
 resource "aws_iam_user_policy_attachment" "s3_rw" {
   count      = length(var.users)
-  user       = "${var.users[count.index]}"
-  policy_arn = "${aws_iam_policy.s3_rw.arn}"
+  user       = var.users[count.index]
+  policy_arn = aws_iam_policy.s3_rw.arn
 }
 
 resource "aws_iam_policy" "s3_rw" {
   name        = "${module.label.name}-s3"
   description = "Policy to allow IAM user full access to ${module.label.name} S3 bucket"
-  policy      = "${data.aws_iam_policy_document.s3_rw.json}"
+  policy      = data.aws_iam_policy_document.s3_rw.json
 }
 
 data "aws_iam_policy_document" "s3_rw" {
@@ -149,12 +149,12 @@ resource "aws_iam_user_policy_attachment" "ecr" {
 }
 
 resource "aws_iam_user_policy_attachment" "deploy" {
-  user       = "${aws_iam_user.deploy.name}"
-  policy_arn = "${aws_iam_policy.deploy.arn}"
+  user       = aws_iam_user.deploy.name
+  policy_arn = aws_iam_policy.deploy.arn
 }
 
 resource "aws_iam_policy" "deploy" {
-  policy = "${data.aws_iam_policy_document.deploy.json}"
+  policy = data.aws_iam_policy_document.deploy.json
 }
 
 data "aws_iam_policy_document" "deploy" {

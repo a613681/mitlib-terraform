@@ -52,6 +52,7 @@ module "rds_docsvcs" {
   db_parameter_group          = "mysql5.5"
   maintenance_window          = "Sun:00:00-Sun:03:00"
   backup_window               = "03:00-06:00"
+  backup_retention_period     = 30
   vpc_id                      = "${module.shared.vpc_id}"
   subnet_ids                  = ["${module.shared.private_subnets}"]
   security_group_ids          = ["${module.eb_docsvcs.security_group_id}"]
@@ -91,21 +92,21 @@ module "eb_docsvcs" {
   # BUCKET_ID and *_S3 Variables are used for SSL config and are deployed via .ebxtensions in the app
   env_vars = "${
     map(
-    "RDS_HOSTNAME",  "${join(",", module.rds_docsvcs.hostname)}",
-    "RDS_USERNAME",  "${var.rds_username}",
-    "RDS_PASSWORD",  "${var.rds_password}",
-    "RDS_DB_NAME",   "docsvcs",
-    "ENVIRONMENT", "${terraform.workspace}",
-    "BUCKET_ID", "${module.s3_cert_store.bucket_id}",
-    "INCOMMON_S3", "https://${module.s3_cert_store.bucket_domain_name}/InCommonChain.crt",
-    "CERT_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.crt",
-    "KEY_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.key",
-    "CYBERSOURCE_ACCESS_KEY", "${var.cybersource_access_key}",
-    "CYBERSOURCE_PROFILE_ID", "${var.cybersource_profile_id}",
-    "MAIL_HOST", "${var.mail_host}",
-    "MAIL_PASSWORD", "${var.mail_password}",
-    "MAIL_PORT", "${var.mail_port}",
-    "MAIL_USERNAME", "${var.mail_username}"
+      "RDS_HOSTNAME", "${join(",", module.rds_docsvcs.hostname)}",
+      "RDS_USERNAME", "${var.rds_username}",
+      "RDS_PASSWORD", "${var.rds_password}",
+      "RDS_DB_NAME", "docsvcs",
+      "ENVIRONMENT", "${terraform.workspace}",
+      "BUCKET_ID", "${module.s3_cert_store.bucket_id}",
+      "INCOMMON_S3", "https://${module.s3_cert_store.bucket_domain_name}/InCommonChain.crt",
+      "CERT_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.crt",
+      "KEY_S3", "https://${module.s3_cert_store.bucket_domain_name}/${module.label.name}.mit.edu.key",
+      "CYBERSOURCE_ACCESS_KEY", "${var.cybersource_access_key}",
+      "CYBERSOURCE_PROFILE_ID", "${var.cybersource_profile_id}",
+      "MAIL_HOST", "${var.mail_host}",
+      "MAIL_PASSWORD", "${var.mail_password}",
+      "MAIL_PORT", "${var.mail_port}",
+      "MAIL_USERNAME", "${var.mail_username}"
     )
   }"
 }

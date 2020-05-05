@@ -12,6 +12,10 @@ resource "aws_db_instance" "default" {
   vpc_security_group_ids      = [aws_security_group.rds.id]
   allow_major_version_upgrade = false
   parameter_group_name        = aws_db_parameter_group.default.name
+  backup_retention_period     = 30
+  backup_window               = "03:00-04:00"
+  maintenance_window          = "Mon:04:00-Mon:05:00"
+  apply_immediately           = true
   tags                        = module.label.tags
 }
 

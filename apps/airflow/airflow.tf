@@ -46,10 +46,6 @@ data "aws_iam_policy_document" "airflow_deploy_ecs" {
   }
 }
 
-resource "aws_iam_access_key" "deploy" {
-  user = aws_iam_user.deploy.name
-}
-
 resource "aws_s3_bucket" "logging" {
   bucket = "${module.label.name}-logging"
   tags   = module.label.tags
