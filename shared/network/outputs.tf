@@ -226,7 +226,7 @@ output "mitnet_alb_public_https_listener_arn" {
 
 output "mitnet_alb_public_all_ingress_sgid" {
   description = "Public ALB security group ID allowing all ingress traffic from ALB"
-  value       = module.mitnet_all_access_from_alb_public.this_security_group_id
+  value       = module.mitnet_all_access_from_mitnet_alb_public.this_security_group_id
 }
 
 output "mitnet_alb_public_zone_id" {

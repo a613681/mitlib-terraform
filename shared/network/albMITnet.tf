@@ -40,7 +40,7 @@ module "mitnet_all_access_from_alb" {
   ]
 
   number_of_computed_ingress_with_source_security_group_id = 1
-  tags                                                     = "${module.sg_label.tags}"
+  tags                                                     = "${module.mitnet_sg_label.tags}"
 }
 
 #########################
@@ -66,7 +66,7 @@ module "mitnet_sg_label_public" {
 
 # Create default security group to allow all ingress from public ALB
 
-module "all_access_from_mitnet_alb_public" {
+module "mitnet_all_access_from_mitnet_alb_public" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "3.8.0"
 
@@ -84,7 +84,7 @@ module "all_access_from_mitnet_alb_public" {
   ]
 
   number_of_computed_ingress_with_source_security_group_id = 1
-  tags                                                     = module.sg_label_public.tags
+  tags                                                     = module.mitnet_sg_label_public.tags
 }
 
 

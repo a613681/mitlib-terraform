@@ -35,3 +35,7 @@ variable "alb_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "vpc_id" {
+  type        = string
+  description = "VPC to build infrastructure in"
+}
