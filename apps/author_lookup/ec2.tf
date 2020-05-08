@@ -3,24 +3,6 @@ module "label" {
   name   = "author-lookup"
 }
 
-
-locals {
-  env = terraform.workspace
-
-  shared_alb_dns = {
-    stage = module.shared.mitnet_alb_public_dnsname
-    prod  = module.shared.mitnet_alb_public_dnsname
-  }
-  shared_alb_listeners = {
-    stage = module.shared.mitnet_alb_public_https_listener_arn
-    prod  = module.shared.mitnet_alb_public_https_listener_arn
-  }
-  shared_alb_sgids = {
-    stage = module.shared.mitnet_alb_public_sgid
-    prod  = module.shared.mitnet_alb_public_sgid
-  }
-  }
-
 resource "null_resource" "ansible_inventory" {
   depends_on = [aws_instance.default]
   provisioner "local-exec" {
@@ -181,38 +163,5 @@ data "template_file" "s3_deploy_policy" {
   }
 }
 
-# ALB
-resource "aws_lb_listener_rule" "default" {
-  listener_arn = lookup(local.shared_alb_listeners, local.env)
-  priority     = 200
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.default.arn
-  }
-
-  condition {
-    field  = "host-header"
-    values = [aws_route53_record.author_lookup_public.fqdn]
-  }
-}
-
-resource "aws_lb_target_group" "default" {
-  name                 = module.label.name
-  port                 = 8000
-  protocol             = "HTTP"
-  vpc_id               = var.vpc_id
-  target_type          = "ip"
-  deregistration_delay = 15
-
-  health_check {
-    path    = "/"
-    matcher = "200-399"
-    port    = 8000
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
 
