@@ -72,6 +72,12 @@ data "template_file" "container_definitions" {
     efs_mount                     = var.mount
     trusted_hosts                 = aws_route53_record.dns.name
     salt                          = var.salt
+    noreply_email_address         = var.noreply_email_address
+    smtp_port                     = var.smtp_port
+    smtp_host                     = var.smtp_host
+    smtp_user                     = var.smtp_user
+    smtp_auth_type                = var.smtp_auth_type
+    smtp_password                 = aws_ssm_parameter.smtp_password.arn
   }
 }
 

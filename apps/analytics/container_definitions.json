@@ -20,11 +20,17 @@
       {"name": "MATOMO_DATABASE_USERNAME", "value": "${matomo_database_username}"},
       {"name": "MATOMO_DATABASE_DBNAME", "value": "${matomo_database_dbname}"},
       {"name": "TRUSTED_HOSTS", "value": "${trusted_hosts}"},
-      {"name": "SALT", "value": "${salt}"}
+      {"name": "SALT", "value": "${salt}"},
+      {"name": "SMTP_NOREPLY_ADDRESS", "value": "${noreply_email_address}"},
+      {"name": "SMTP_PORT", "value": "${smtp_port}"},
+      {"name": "SMTP_HOST", "value": "${smtp_host}"},
+      {"name": "SMTP_AUTH_TYPE", "value": "${smtp_auth_type}"},
+      {"name": "SMTP_USER", "value": "${smtp_user}"}
     ],
       "secrets": [
         {"name": "MATOMO_DATABASE_PASSWORD", "valueFrom": "${matomo_database_password}"},
-        {"name": "MYSQL_PASSWORD", "valueFrom": "${mysql_password}"}
+        {"name": "MYSQL_PASSWORD", "valueFrom": "${mysql_password}"},
+        {"name": "SMTP_PASSWORD", "valueFrom": "${smtp_password}"}
     ],
     "mountPoints": [
         {

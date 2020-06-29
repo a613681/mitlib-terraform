@@ -73,3 +73,37 @@ variable "salt" {
   description = "installation salt"
   type        = string
 }
+
+# mail 
+
+variable "noreply_email_address" {
+  description = "noreply_email_address"
+  type        = string
+}
+
+variable "smtp_port" {
+  description = "smtp port"
+  type        = string
+}
+
+variable "smtp_host" {
+  description = "smtp_host"
+  type        = string
+}
+
+variable "smtp_auth_type" {
+  description = "smtp auth type"
+  type        = string
+}
+
+variable "smtp_user" {
+  description = "smtp user"
+  type        = string
+}
+
+variable "smtp_password" {
+  description = "smtp password"
+  type        = string
+}
+
+
