@@ -40,6 +40,13 @@ resource "aws_ssm_parameter" "matomo_database_password" {
   value = var.matomo_database_password
 }
 
+resource "aws_ssm_parameter" "smtp_password" {
+  name  = "${module.label.name}-smtp_password"
+  tags  = module.label.tags
+  type  = "SecureString"
+  value = var.smtp_password
+}
+
 resource "aws_iam_role_policy" "ssm" {
   name   = "${module.label.name}-ssm"
   role   = aws_iam_role.default.name
@@ -52,7 +59,8 @@ data "aws_iam_policy_document" "ssm" {
 
     resources = [
       aws_ssm_parameter.mysql_password.arn,
-      aws_ssm_parameter.matomo_database_password.arn
+      aws_ssm_parameter.matomo_database_password.arn,
+      aws_ssm_parameter.smtp_password.arn
     ]
   }
 }
