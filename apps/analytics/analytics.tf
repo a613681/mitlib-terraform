@@ -18,7 +18,7 @@ locals {
 
   shared_alb_sgids = {
     "stage" = "${module.shared.alb_restricted_sgid}"
-    "prod"  = "${module.shared.alb_public_all_ingress_sgid}"
+    "prod"  = "${module.shared.alb_public_sgid}"
   }
 }
 
