@@ -74,8 +74,6 @@ variable "salt" {
   type        = string
 }
 
-# mail 
-
 variable "noreply_email_address" {
   description = "noreply_email_address"
   type        = string
@@ -106,4 +104,7 @@ variable "smtp_password" {
   type        = string
 }
 
-
+variable schedule_expression {
+  type        = string
+  description = "schedule expression"
+}

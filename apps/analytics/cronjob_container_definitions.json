@@ -1,0 +1,52 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",  
+    "logConfiguration": {
+      "logDriver" : "awslogs",
+      "options": {
+        "awslogs-group": "${log_group}",
+        "awslogs-region": "${awslogs_region}",
+        "awslogs-stream-prefix": "${log_prefix}"
+      }
+    },
+    "command": ["/usr/local/bin/php", "/var/www/html/console", "core:archive", "--url=https://$TRUSTED_HOSTS/"],
+    "essential": true,
+    "environment": [
+      {"name": "MYSQL_DATABASE_NAME", "value": "${mysql_database_name}"}, 
+      {"name": "MYSQL_USER", "value": "${mysql_user}"},
+      {"name": "MATOMO_DATABASE_HOST", "value": "${matomo_database_host}"},    
+      {"name": "MATOMO_DATABASE_ADAPTER", "value":"${matomo_database_adapter}"},
+      {"name": "MATOMO_DATABASE_TABLES_PREFIX", "value":"${matomo_database_tables_prefix}"},
+      {"name": "MATOMO_DATABASE_USERNAME", "value": "${matomo_database_username}"},
+      {"name": "MATOMO_DATABASE_DBNAME", "value": "${matomo_database_dbname}"},
+      {"name": "TRUSTED_HOSTS", "value": "${trusted_hosts}"},
+      {"name": "SALT", "value": "${salt}"},
+      {"name": "SMTP_NOREPLY_ADDRESS", "value": "${noreply_email_address}"},
+      {"name": "SMTP_PORT", "value": "${smtp_port}"},
+      {"name": "SMTP_HOST", "value": "${smtp_host}"},
+      {"name": "SMTP_AUTH_TYPE", "value": "${smtp_auth_type}"},
+      {"name": "SMTP_USER", "value": "${smtp_user}"}
+    ],
+      "secrets": [
+        {"name": "MATOMO_DATABASE_PASSWORD", "valueFrom": "${matomo_database_password}"},
+        {"name": "MYSQL_PASSWORD", "valueFrom": "${mysql_password}"},
+        {"name": "SMTP_PASSWORD", "valueFrom": "${smtp_password}"}
+    ],
+    "mountPoints": [
+        {
+          "sourceVolume": "${efs_volume}",
+          "containerPath": "${efs_mount}",
+          "readOnly": false
+        }
+      ],
+
+    "portMappings": [
+                {                
+                "hostPort": 80,
+                "containerPort": 80,
+                "protocol": "tcp"
+        }
+    ]
+  }
+]
