@@ -41,9 +41,3 @@ output "admin_accounts" {
   description = "Names of the administrator accounts"
   value       = aws_iam_group_membership.admins.users
 }
-
-# The IAM user accounts created.
-output "user_account_arns" {
-  description = "ARNs of the user accounts"
-  value       = aws_iam_user.users.*.arn
-}
