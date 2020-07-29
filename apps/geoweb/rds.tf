@@ -16,6 +16,7 @@ module "rds" {
   backup_retention_period = "${var.postgres_backup_retention}"
   vpc_id                  = "${module.shared.vpc_id}"
   subnet_ids              = ["${module.shared.private_subnets}"]
+  storage_encrypted       = "true"
 
   security_group_ids = [
     "${module.shared.bastion_ingress_sgid}",
