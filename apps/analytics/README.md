@@ -8,15 +8,18 @@ This folder contains the configuration for deploying of the [matomo analytics do
 * ALB target group to direct ingress traffic from our ALB to the container(s)
 * ECS cluster to run our Fargate task
 * Fargate task to run matomo container
+* Fargate scheduled task cron to run reports archive
 * Fargate service to excecute the task
-* IAM task excecution role
+* IAM roles and user
+* Security groups
 * EFS for container persistent storage
 * RDS to store matomo database
+* Cloudwatch log group, event rule
 
 
 
 #### Additional notes:
-* 
+* Matomo Upgrades are done by getting version on stage, test and push to production.
 
 ## Outputs
 | Name | Description |
