@@ -1,0 +1,6 @@
+- hosts: app
+  gather_facts: False
+  become: true
+  become_user: root
+  roles:
+    - app

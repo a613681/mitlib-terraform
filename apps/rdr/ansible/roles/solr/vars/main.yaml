@@ -1,0 +1,8 @@
+# Solr
+solr_version: "7.7.2"
+solr_url: "https://archive.apache.org/dist/lucene/solr/{{solr_version}}/solr-{{solr_version}}-src.tgz"
+solr_group: "solr"
+solr_user: "solr"
+solr_install_dir: "/opt/solr"
+
+

@@ -1,0 +1,55 @@
+---
+
+- group: name={{zookeeper_group}} system=yes
+- user: name={{zookeeper_user}} group={{zookeeper_group}} system=yes
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    mode: '0755'
+  with_items:
+    - "{{ zookeeper_install_dir }}"
+    - "{{ zookeeper_data_dir }}"
+    - "{{ zookeeper_log_dir }}"
+
+- name: Download and extract Zookeeper
+  unarchive:
+    src: "{{zookeeper_url}}"
+    dest: "{{ zookeeper_install_dir }}"
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+- name: Add myid file
+  template:
+    src: myid.j2
+    dest: "{{zookeeper_data_dir}}/myid"
+    mode: '0644'
+    owner: "{{zookeeper_user}}"
+    group: "{{zookeeper_group}}"
+
+- name: Add conf file
+  template:
+    src: zoo.cfg.j2
+    dest: "{{ zookeeper_install_dir }}/conf/zoo.cfg"
+    mode: '0644'
+    owner: "{{zookeeper_user}}"
+    group: "{{zookeeper_group}}"
+
+- name: Create ZooKeeper service
+  template:
+    src: zookeeper.service.j2
+    dest: "/etc/systemd/system/zookeeper.service"
+    mode: '0644'
+    owner: "{{zookeeper_user}}"
+    group: "{{zookeeper_group}}"
+
+- name: Enable and Bounce ZooKeeper service
+  systemd:
+    name: zookeeper.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  notify: Restart ZooKeeper

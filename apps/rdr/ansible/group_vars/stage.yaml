@@ -1,0 +1,3 @@
+# ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %h:%p -q ec2-user@bastion-stage.mitlib.net"'
+ansible_user: ec2-user

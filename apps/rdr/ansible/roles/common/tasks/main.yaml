@@ -1,0 +1,9 @@
+---
+
+- name: Install packages
+  yum: name={{ packages }} state=present
+  vars:
+    packages:
+      - java-1.8.0-openjdk
+      - curl
+      - nc

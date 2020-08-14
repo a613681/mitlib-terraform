@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Zookeeper Service
+Requires=network.target
+After=network.target
+
+[Service]
+Type=forking
+User=zookeeper
+Group=zookeeper
+ExecStart={{zookeeper_install_dir}}/bin/zkServer.sh start {{zookeeper_install_dir}}/conf/zoo.cfg
+ExecStop={{zookeeper_install_dir}}/bin/zkServer.sh stop {{zookeeper_install_dir}}/conf/zoo.cfg
+ExecReload={{zookeeper_install_dir}}/bin/zkServer.sh restart {{zookeeper_install_dir}}/conf/zoo.cfg
+Restart=on-failure
+TimeoutSec=60
+
+[Install]
+WantedBy=multi-user.target
+
