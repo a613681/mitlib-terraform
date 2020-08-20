@@ -7,7 +7,7 @@ provider "template" {
   version = "~> 2.1"
 }
 
-#Tell terraform to use the S3 bucket and DynamoDB we created
+# Tell terraform to use the S3 bucket and DynamoDB we created
 terraform {
   required_version = ">= 0.12"
 

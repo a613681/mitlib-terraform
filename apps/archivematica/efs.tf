@@ -1,10 +1,10 @@
-# EFS File system used for the Archivematica App processing folders
+# EFS File system used for the Archivematica App processing folders.
 resource "aws_efs_file_system" "default" {
   creation_token = "${module.label.name}-efs"
   tags           = module.label.tags
 }
 
-# A virtual NFS servers to serve the EFS file system. We use an internal
+# A virtual NFS server to serve the EFS file system. We use an internal
 # subnet from the VPC to prevent outside access.
 resource "aws_efs_mount_target" "default" {
   file_system_id  = aws_efs_file_system.default.id
@@ -45,6 +45,6 @@ data "template_file" "default" {
 
   vars = {
     efs_dns   = aws_efs_file_system.default.dns_name
-    efs_mount = var.mount
+    efs_mount = var.efs_mount
   }
 }

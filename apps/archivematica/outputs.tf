@@ -4,6 +4,6 @@ output "eip_public_address" {
 }
 
 output "hostname" {
-  description = "Hostname of the Archivematica ec2 application server"
+  description = "Hostname of the Archivematica EC2 application server"
   value       = [aws_route53_record.default.*.fqdn]
 }
