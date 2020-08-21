@@ -1,0 +1,6 @@
+---
+
+- name: Restart ZooKeeper
+  systemd:
+    state: restarted
+    name: zookeeper

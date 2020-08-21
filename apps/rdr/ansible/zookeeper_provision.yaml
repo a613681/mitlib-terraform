@@ -1,0 +1,6 @@
+- hosts: zookeepers
+  gather_facts: False
+  become: true
+  become_user: root
+  roles:
+    - zookeeper

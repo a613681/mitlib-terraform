@@ -1,0 +1,29 @@
+
+[zookeepers]
+%{ for fqdn in zookeepers ~}
+${fqdn}
+%{ endfor ~}
+
+
+
+
+[solrs]
+%{ for fqdn in solrs ~}
+${fqdn}
+%{ endfor ~}
+
+
+
+
+[app]
+%{ for fqdn in app ~}
+${fqdn}
+%{ endfor ~}
+
+
+
+
+[stage:children]
+zookeepers
+solrs
+app
