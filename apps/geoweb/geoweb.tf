@@ -80,6 +80,26 @@ resource "aws_iam_access_key" "deploy" {
   user = "${aws_iam_user.deploy.name}"
 }
 
+data "aws_iam_policy_document" "ecs_update" {
+  statement {
+    actions   = ["ecs:UpdateService"]
+    resources = ["arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/geoblacklight*"]
+  }
+}
+
+resource "aws_iam_policy" "ecs_update" {
+  policy      = "${data.aws_iam_policy_document.ecs_update.json}"
+  description = "Policy used by deploy user to redeploy service."
+}
+
+resource "aws_iam_user_policy_attachment" "ecs_update" {
+  user       = "${aws_iam_user.deploy.name}"
+  policy_arn = "${aws_iam_policy.ecs_update.arn}"
+}
+
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 #############
 ## Logging ##
 #############

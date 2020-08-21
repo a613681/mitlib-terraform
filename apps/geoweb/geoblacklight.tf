@@ -287,7 +287,6 @@ resource "aws_ecs_task_definition" "geoblacklight" {
   family                   = "${module.label_geoblacklight.name}"
   container_definitions    = "${data.template_file.geoblacklight.rendered}"
   requires_compatibilities = ["FARGATE"]
-  tags                     = "${module.label_geoblacklight.tags}"
   execution_role_arn       = "${aws_iam_role.geoblacklight.arn}"
   network_mode             = "awsvpc"
   cpu                      = "${var.geoblacklight_cpu}"
@@ -334,7 +333,6 @@ resource "aws_ecs_task_definition" "geoblacklight_cleanup" {
   family                   = "${module.label_geoblacklight.name}-cleanup"
   container_definitions    = "${data.template_file.geoblacklight_cleanup.rendered}"
   requires_compatibilities = ["FARGATE"]
-  tags                     = "${module.label_geoblacklight.tags}"
   execution_role_arn       = "${aws_iam_role.geoblacklight.arn}"
   network_mode             = "awsvpc"
   cpu                      = "256"
