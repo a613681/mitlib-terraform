@@ -1,9 +1,8 @@
-#Create an S3 bucket and policy for storing our SSH public keys
-#Move this part +public keys folder to the module?
-variable "ssh_public_key_names" {
-  default = "alex,mike"
+module "latest_ami" {
+  source = "github.com/mitlibraries/tf-mod-latest-ami?ref=0.12"
 }
 
+# S3 bucket and policy for storing our SSH public keys
 resource "aws_s3_bucket" "ssh_public_keys" {
   bucket = "bastion-ssh-pub-keys"
   acl    = "private"
@@ -33,34 +32,32 @@ EOF
   tags = module.bastion.tags
 }
 
+# Load the public SSH keys from the S3 bucket
 resource "aws_s3_bucket_object" "ssh_public_keys" {
   bucket = aws_s3_bucket.ssh_public_keys.bucket
-  key    = "${element(split(",", var.ssh_public_key_names), count.index)}.pub"
+  key    = "${element(split(",", var.sec_ssh_public_keys), count.index)}.pub"
 
   # Make sure that you put files into correct location and name them accordingly (`public_keys/{keyname}.pub`)
   content = file(
-    "pub_keys/${element(split(",", var.ssh_public_key_names), count.index)}.pub",
+    "pub_keys/${element(split(",", var.sec_ssh_public_keys), count.index)}.pub",
   )
-  count = length(split(",", var.ssh_public_key_names))
+  count = length(split(",", var.sec_ssh_public_keys))
 
   depends_on = [aws_s3_bucket.ssh_public_keys]
 }
 
-module "latest_ami" {
-  source = "github.com/mitlibraries/tf-mod-latest-ami?ref=0.12"
-}
-
+# Create the ec2 bastion host and associated auto-scaling group
 module "bastion" {
   source                    = "github.com/mitlibraries/tf-mod-bastion-host?ref=0.12"
   name                      = "bastion"
-  instance_type             = "t3.nano"
+  instance_type             = var.ec2_inst_type
   ami                       = module.latest_ami.ec2_linux_ami_id
   region                    = var.aws_region
-  key_name                  = "mit-mgraves"
+  key_name                  = var.ec2_key_name
   iam_instance_profile      = "s3_readonly-allow_associateaddress-${terraform.workspace}"
   s3_bucket_name            = aws_s3_bucket.ssh_public_keys.bucket
   vpc_id                    = module.shared.vpc_id
-  allowed_cidr              = ["18.28.0.0/16", "18.30.0.0/16"]
+  allowed_cidr              = var.sec_ssh_access_subnets
   logzio_token              = var.logzio_token
   subnet_ids                = module.shared.public_subnets
   eip                       = aws_eip.bastion.public_ip
@@ -75,18 +72,18 @@ EOF
 
 }
 
-#Create Route53 record
+# Create an Elastic IP for the bastion host
 resource "aws_eip" "bastion" {
   vpc = true
 
   tags = module.bastion.tags
 }
 
+# Create Route53 record
 resource "aws_route53_record" "bastion" {
-  zone_id = module.shared.public_zoneid
+  zone_id = var.r53_dns_zone_id
   name    = "${module.bastion.name}.mitlib.net"
   type    = "A"
   ttl     = "300"
   records = [aws_eip.bastion.public_ip]
 }
-
