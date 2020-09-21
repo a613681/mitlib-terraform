@@ -1,5 +1,4 @@
-# Create dpworkshop.org hosted zone and associated DNS entries
-
+# Create dpworkshop.org hosted zone and associated DNS entries.
 resource "aws_route53_zone" "dpworkshop" {
   name = "dpworkshop.org"
 
@@ -11,22 +10,22 @@ resource "aws_route53_zone" "dpworkshop" {
 }
 
 resource "aws_route53_record" "dpworkshop-ns" {
-  zone_id = "${aws_route53_zone.dpworkshop.zone_id}"
-  name    = "${aws_route53_zone.dpworkshop.name}"
+  zone_id = aws_route53_zone.dpworkshop.zone_id
+  name    = aws_route53_zone.dpworkshop.name
   type    = "NS"
   ttl     = "86400"
 
   records = [
-    "${aws_route53_zone.dpworkshop.name_servers.0}",
-    "${aws_route53_zone.dpworkshop.name_servers.1}",
-    "${aws_route53_zone.dpworkshop.name_servers.2}",
-    "${aws_route53_zone.dpworkshop.name_servers.3}",
+    aws_route53_zone.dpworkshop.name_servers.0,
+    aws_route53_zone.dpworkshop.name_servers.1,
+    aws_route53_zone.dpworkshop.name_servers.2,
+    aws_route53_zone.dpworkshop.name_servers.3,
   ]
 }
 
 resource "aws_route53_record" "dpworkshop-soa" {
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  name    = "${aws_route53_zone.dpworkshop.name}"
+  zone_id = aws_route53_zone.dpworkshop.id
+  name    = aws_route53_zone.dpworkshop.name
   type    = "SOA"
   ttl     = "900"
 
@@ -35,60 +34,60 @@ resource "aws_route53_record" "dpworkshop-soa" {
   ]
 }
 
-# Create dpworkshop.org DNS entries
+# Create dpworkshop.org DNS entries.
 resource "aws_route53_record" "dpworkshop-web" {
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  name    = "${aws_route53_zone.dpworkshop.name}"
+  zone_id = aws_route53_zone.dpworkshop.id
+  name    = aws_route53_zone.dpworkshop.name
   type    = "A"
-  ttl     = "300"
-  records = ["23.185.0.3"]
+  ttl     = 300
+  records = var.r53_dpworkshop_prod_value
 }
 
 resource "aws_route53_record" "dpworkshop-web1" {
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  name    = "${aws_route53_zone.dpworkshop.name}"
+  zone_id = aws_route53_zone.dpworkshop.id
+  name    = aws_route53_zone.dpworkshop.name
   type    = "AAAA"
-  ttl     = "300"
-  records = ["2620:12a:8000::3", "2620:12a:8001::3"]
+  ttl     = 300
+  records = var.r53_dpworkshop_prod_ipv6_value
 }
 
 resource "aws_route53_record" "dpworkshop_dev" {
   name    = "dev"
-  ttl     = 300
   type    = "CNAME"
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  records = ["dev-mitlib-dpworkshop.pantheonsite.io"]
+  ttl     = 300
+  zone_id = aws_route53_zone.dpworkshop.id
+  records = var.r53_dpworkshop_dev_value
 }
 
 resource "aws_route53_record" "dpworkshop_test" {
   name    = "test"
-  ttl     = 300
   type    = "CNAME"
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  records = ["test-mitlib-dpworkshop.pantheonsite.io"]
+  ttl     = 300
+  zone_id = aws_route53_zone.dpworkshop.id
+  records = var.r53_dpworkshop_test_value
 }
 
-# Create TDR Demo DNS entries
+# Create TDR Demo DNS entries.
 resource "aws_route53_record" "tdr" {
   name    = "tdr"
-  ttl     = 300
   type    = "CNAME"
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  records = ["live-mitlib-trac-demo.pantheonsite.io"]
+  ttl     = 300
+  zone_id = aws_route53_zone.dpworkshop.id
+  records = var.r53_tdr_value
 }
 
 resource "aws_route53_record" "tdr_dev" {
   name    = "tdr-dev"
-  ttl     = 300
   type    = "CNAME"
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  records = ["dev-mitlib-trac-demo.pantheonsite.io"]
+  ttl     = 300
+  zone_id = aws_route53_zone.dpworkshop.id
+  records = var.r53_tdr_dev_value
 }
 
 resource "aws_route53_record" "tdr_test" {
   name    = "tdr-test"
-  ttl     = 300
   type    = "CNAME"
-  zone_id = "${aws_route53_zone.dpworkshop.id}"
-  records = ["test-mitlib-trac-demo.pantheonsite.io"]
+  ttl     = 300
+  zone_id = aws_route53_zone.dpworkshop.id
+  records = var.r53_tdr_test_value
 }
