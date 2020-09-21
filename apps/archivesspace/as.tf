@@ -3,7 +3,7 @@ resource "aws_route53_record" "as" {
   ttl     = 3600
   type    = "CNAME"
   zone_id = module.shared.public_zoneid
-  records = ["as-prod-general-app4.LYRTECH.ORG"]
+  records = var.r53_archivesspace_cname_public_value
 }
 
 resource "aws_route53_record" "astaff" {
@@ -11,7 +11,7 @@ resource "aws_route53_record" "astaff" {
   ttl     = 3600
   type    = "CNAME"
   zone_id = module.shared.public_zoneid
-  records = ["as-prod-general-app4.LYRTECH.ORG"]
+  records = var.r53_archivesspace-staff_cname_public_value
 }
 
 resource "aws_route53_record" "emma" {
@@ -19,7 +19,7 @@ resource "aws_route53_record" "emma" {
   ttl     = 600
   type    = "CNAME"
   zone_id = module.shared.public_zoneid
-  records = ["as-prod-general-app4.LYRTECH.ORG"]
+  records = var.r53_emmas-lib_cname_public_value
 }
 
 resource "aws_route53_record" "emmastaff" {
@@ -27,7 +27,7 @@ resource "aws_route53_record" "emmastaff" {
   ttl     = 600
   type    = "CNAME"
   zone_id = module.shared.public_zoneid
-  records = ["as-prod-general-app4.LYRTECH.ORG"]
+  records = var.r53_emmastaff-lib_cname_public_value
 }
 
 resource "aws_route53_record" "as_private" {
@@ -35,5 +35,5 @@ resource "aws_route53_record" "as_private" {
   ttl     = 3600
   type    = "CNAME"
   zone_id = module.shared.private_zoneid
-  records = ["as-prod-general-app4.LYRTECH.ORG"]
+  records = var.r53_archivesspace_cname_private_value
 }
