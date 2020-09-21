@@ -1,4 +1,4 @@
 module "bucket" {
-  source = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.12"
   name   = "deploy-mitlib"
 }
