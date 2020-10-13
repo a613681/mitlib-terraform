@@ -1,1 +1,38 @@
 ---
+
+- name: Download dvinstall
+  unarchive:
+    src: "https://github.com/IQSS/dataverse/releases/download/v5.0/dvinstall.zip"
+    dest: /tmp
+    remote_src: yes
+
+# Payara
+- group: name={{ dataverse.payara.group }} system=yes
+- user: name={{ dataverse.payara.user }} group={{ dataverse.payara.group }} system=yes
+
+- name: Download and extract payara
+  unarchive:
+    src: "https://github.com/payara/Payara/releases/download/payara-server-{{dataverse.payara.version}}/payara-{{dataverse.payara.version}}.zip"
+    dest: /opt
+    owner: "{{ dataverse.payara.user }}"
+    group: "{{ dataverse.payara.group }}"
+    remote_src: yes
+
+- name: Create payara service
+  template:
+    src: payara.service.j2
+    dest: "/etc/systemd/system/payara.service"
+    mode: '0644'
+
+- name: Enable and Bounce payara service
+  systemd:
+    name: payara.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  notify: Restart Payara
+
+- name: Bounce payara service
+  systemd:
+    daemon_reload: yes
+  notify: Restart Payara

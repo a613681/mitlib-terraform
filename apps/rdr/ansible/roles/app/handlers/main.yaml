@@ -1,0 +1,4 @@
+- name: Restart Payara
+  systemd:
+    name: payara
+    state: restarted

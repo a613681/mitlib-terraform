@@ -1,14 +1,14 @@
-resource "null_resource" "app_ansible_playbook" {
-  triggers = {
-    build_number = "${timestamp()}"
-  }
-  provisioner "local-exec" {
-    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/app_provision.yaml | tee -a app_provision.log"
-  }
-  depends_on = [
-    aws_route53_record.app,
-  ]
-}
+# resource "null_resource" "app_ansible_playbook" {
+#   triggers = {
+#     build_number = "${timestamp()}"
+#   }
+#   provisioner "local-exec" {
+#     command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/app_provision.yaml | tee -a app_provision.log"
+#   }
+#   depends_on = [
+#     aws_route53_record.app,
+#   ]
+# }
 
 resource "aws_route53_record" "app" {
   zone_id = module.shared.public_zoneid
@@ -28,13 +28,13 @@ resource "aws_lb_listener_rule" "default" {
 
   condition {
     field  = "host-header"
-    values = [aws_route53_record.app.name]
+    values = [aws_route53_record.app.fqdn]
   }
 }
 
 resource "aws_lb_target_group" "default" {
-  name        = module.label.name
-  port        = 80
+  name        = "${module.label.name}-app"
+  port        = 8080
   protocol    = "HTTP"
   vpc_id      = module.shared.vpc_id
   target_type = "ip"
@@ -44,12 +44,18 @@ resource "aws_lb_target_group" "default" {
   health_check {
     path    = "/"
     matcher = "200-399"
-    port    = 80
+    port    = 8080
   }
 
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_lb_target_group_attachment" "app_default" {
+  target_group_arn = aws_lb_target_group.default.arn
+  target_id        = aws_instance.app.private_ip
+  port             = 8080
 }
 
 resource "aws_route53_record" "app_priv" {
@@ -66,10 +72,11 @@ resource "aws_instance" "app" {
   ebs_optimized               = true
   associate_public_ip_address = false
   key_name                    = var.key_name
-  subnet_id                   = element(module.shared.private_subnets, 2)
-  vpc_security_group_ids      = [aws_security_group.app_sg.id]
-  iam_instance_profile        = aws_iam_instance_profile.get_pubkey_profile.name
-  user_data                   = data.template_file.app_user_data.rendered
+  # subnet_id                   = module.shared.private_subnets
+  subnet_id              = element(module.shared.private_subnets, 2)
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.get_pubkey_profile.name
+  user_data              = data.template_cloudinit_config.app_config.rendered
   tags = {
     "Name" = "${module.label.name}-app"
   }
@@ -80,7 +87,7 @@ resource "aws_instance" "app" {
 }
 
 resource "aws_security_group" "app_sg" {
-  name        = "${module.label.name}_app_sg"
+  name        = "${module.label.name}-app-sg"
   description = "${module.label.name} application security group"
   vpc_id      = module.shared.vpc_id
   tags = {
@@ -88,8 +95,8 @@ resource "aws_security_group" "app_sg" {
   }
 
   ingress {
-    from_port       = 80
-    to_port         = 80
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = ["${lookup(local.shared_alb_sgids, local.env)}"]
   }
@@ -107,8 +114,8 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
-data "template_file" "app_user_data" {
-  template = file("${path.module}/files/user_data.sh")
+data "template_file" "app_pub_keys" {
+  template = file("${path.module}/files/pub_keys.sh")
   vars = {
     s3_bucket_pubkeys = var.s3_bucket_pubkeys
     s3_bucket_uri     = var.s3_bucket_pubkeys_uri
@@ -116,10 +123,13 @@ data "template_file" "app_user_data" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "app" {
-  name = "${module.label.name}-app"
-  tags = {
-    "Name" = "${module.label.name}-app"
+data "template_cloudinit_config" "app_config" {
+  gzip          = true
+  base64_encode = true
+  # Main cloud-config configuration file.
+  part {
+    filename     = "pub_keys.sh"
+    content_type = "text/x-shellscript"
+    content      = data.template_file.zk_pub_keys.rendered
   }
-  retention_in_days = 30
 }

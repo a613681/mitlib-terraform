@@ -1,3 +1,190 @@
 ---
 
+- group: name={{ dataverse.solr.group }} system=yes
+- user: name={{ dataverse.solr.user }} group={{ dataverse.solr.group }} system=yes
 
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+    mode: '0755'
+  with_items:
+    - "{{ dataverse.solr.root }}"
+    - "{{ dataverse.solr.logs }}"
+    - "{{ dataverse.solr.data }}"
+
+- name: Download and extract solr
+  unarchive:
+    src: "https://archive.apache.org/dist/lucene/solr/{{dataverse.solr.version}}/solr-{{dataverse.solr.version}}.tgz"
+    dest: "{{ dataverse.solr.root }}"
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+- name: Add solr.in.sh startup file
+  template:
+    src: solr.in.sh.j2
+    dest: "{{ dataverse.solr.root }}/bin/solr.in.sh"
+    mode: '0644'
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+    backup: yes
+
+- name: Modify jetty.xml file
+  template:
+    src: jetty.xml.j2
+    dest: "{{ dataverse.solr.root }}/server/etc/jetty.xml"
+    mode: '0644'
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+    backup: yes
+
+- name: populate collection1
+  copy:
+    src: "{{ dataverse.solr.root }}/server/solr/configsets/_default/"
+    dest: "{{ dataverse.solr.root }}/server/solr/collection1"
+    remote_src: yes
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+
+# These solr config files are from dvinstall, and ping/healthcheck is added to solrconfig.xml
+- copy:
+    src: solrconfig.xml
+    dest: "{{ dataverse.solr.root }}/server/solr/collection1/conf"
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+
+- copy:
+    src: schema.xml
+    dest: "{{ dataverse.solr.root }}/server/solr/collection1/conf"
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+
+- copy:
+    src: schema_dv_mdb_copies.xml
+    dest: "{{ dataverse.solr.root }}/server/solr/collection1/conf"
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+
+- copy:
+    src: schema_dv_mdb_fields.xml
+    dest: "{{ dataverse.solr.root }}/server/solr/collection1/conf"
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+
+- name: chown some subdirectories to solr service account
+  file: path="{{ item }}" state=directory recurse=yes
+        owner="{{ dataverse.solr.user }}" group="{{ dataverse.solr.group }}"
+  with_items:
+    - "{{ dataverse.solr.root }}/server/solr/collection1"
+    - "{{ dataverse.solr.root }}/bin"
+
+# - name: Create solr service
+  template:
+    src: solr.service.j2
+    dest: "/etc/systemd/system/solr.service"
+    mode: '0644'
+    owner: "{{ dataverse.solr.user }}"
+    group: "{{ dataverse.solr.group }}"
+  become_user: root
+  become: true
+
+- name: Enable and Bounce solr service
+  systemd:
+    name: solr.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  notify: Restart Solr
+
+# Please keep order below otherwise create_colletion fails
+- name: 1. Upload solr config to zookeeper
+  shell: |
+    "{{ dataverse.solr.root }}"/bin/solr zk upconfig -n collection1 -d "{{ dataverse.solr.root }}"/server/solr/collection1/conf/ -V
+  become: yes
+  become_user: "{{ dataverse.solr.user }}"
+  args:
+      executable: /bin/bash
+  register: result
+  notify: Restart Solr
+- debug: var=result
+
+- name: 2. Upload solr.xml to zookeeper
+  shell: |
+    "{{ dataverse.solr.root }}"/bin/solr zk cp file:"{{ dataverse.solr.root }}"/server/solr/solr.xml zk:/solr.xml  -V
+  become: yes
+  become_user: "{{ dataverse.solr.user }}"
+  args:
+      executable: /bin/bash
+  register: result
+  notify: Restart Solr
+- debug: var=result
+
+- name: 3. Rename  "solr.xml" file
+  copy:
+    src: "{{ dataverse.solr.root }}/server/solr/solr.xml"
+    dest: "{{ dataverse.solr.root }}/server/solr/000solr.xml"
+    remote_src: yes
+  become: true
+  become_method: sudo
+  notify: Restart Solr
+
+- name: 4. Remove solr.xml
+  file:
+    path: "{{ dataverse.solr.root }}/server/solr/solr.xml"
+    state: absent
+  become: true
+  become_method: sudo
+  notify: Restart Solr
+
+- name: 5. Crate solr collection
+  shell: |
+    "{{ dataverse.solr.root }}"/bin/solr create_collection -c collection1 -d "{{ dataverse.solr.root }}"/server/solr/collection1/conf/  -V
+  become: yes
+  become_user: "{{ dataverse.solr.user }}"
+  args:
+      executable: /bin/bash
+  register: result
+  failed_when: result.stdout.find("Core 'collection1' already exists!") != -1
+
+- debug: var=result
+
+- name: Bounce solr service
+  systemd:
+    daemon_reload: yes
+  notify: Restart Solr
+
+- name: Set mount point
+  set_fact:
+    efs_solrs_mount: "{{ lookup('aws_ssm', '{{ app_name }}-{{ terraform_workspace }}-efs-solrs-mount', region='us-east-1', decrypt=True) }}"
+  register: result
+- debug: var=result
+
+- name: Set efs dns
+  set_fact:
+    efs_solrs_dns: "{{ lookup('aws_ssm', '{{ app_name }}-{{ terraform_workspace }}-efs-solrs-dns', region='us-east-1', decrypt=True) }}"
+  register: result
+- debug: var=result
+
+- name: Ensure efs mount directory exists.
+  file:
+    path: "{{ efs_solrs_mount }}"
+    state: directory
+    mode: 0755
+  become_user: root
+  become: true
+  register: result
+- debug: var=result
+
+- name: Ensure efs volume is mounted.
+  mount:
+    name: "{{ efs_solrs_mount }}"
+    src: "{{ efs_solrs_dns }}:/"
+    fstype: nfs4
+    opts: nfsvers=4.1
+    state: mounted
+  become_user: root
+  become: true
+  register: result
+- debug: var=result
