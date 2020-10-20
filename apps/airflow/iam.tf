@@ -25,6 +25,7 @@ data "aws_iam_policy_document" "airflow_ssm" {
       aws_ssm_parameter.sqlalchemy_conn.arn,
       aws_ssm_parameter.fernet_key.arn,
       aws_ssm_parameter.results_backend.arn,
+      aws_ssm_parameter.rdr_key.arn,
     ]
   }
 }
