@@ -1,29 +1,29 @@
 locals {
-  env = "${terraform.workspace}"
+  env = terraform.workspace
 
   shared_alb_dns = {
-    "stage" = "${module.shared.alb_restricted_dnsname}"
-    "prod"  = "${module.shared.alb_public_dnsname}"
+    "stage" = module.shared.alb_restricted_dnsname
+    "prod"  = module.shared.alb_public_dnsname
   }
 
   shared_alb_listeners = {
-    "stage" = "${module.shared.alb_restricted_https_listener_arn}"
-    "prod"  = "${module.shared.alb_public_https_listener_arn}"
+    "stage" = module.shared.alb_restricted_https_listener_arn
+    "prod"  = module.shared.alb_public_https_listener_arn
   }
 
   shared_alb_sgids = {
-    "stage" = "${module.shared.alb_restricted_sgid}"
-    "prod"  = "${module.shared.alb_public_sgid}"
+    "stage" = module.shared.alb_restricted_sgid
+    "prod"  = module.shared.alb_public_sgid
   }
 
   shared_alb_zoneid = {
-    "stage" = "${module.shared.alb_restricted_zone_id}"
-    "prod"  = "${module.shared.alb_public_zone_id}"
+    "stage" = module.shared.alb_restricted_zone_id
+    "prod"  = module.shared.alb_public_zone_id
   }
 }
 
 module "label" {
-  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
   name   = "geoweb"
 }
 
@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "ecs_task_exec" {
   statement {
     actions = ["sts:AssumeRole"]
 
-    principals = {
+    principals {
       type        = "Service"
       identifiers = ["ecs-tasks.amazonaws.com"]
     }
@@ -63,21 +63,21 @@ data "aws_iam_policy" "ecs_exec" {
 
 resource "aws_iam_user" "deploy" {
   name = "${module.label.name}-deploy"
-  tags = "${module.label.tags}"
+  tags = module.label.tags
 }
 
 resource "aws_iam_user_policy_attachment" "slingshot_deploy_ecr" {
-  user       = "${aws_iam_user.deploy.name}"
-  policy_arn = "${module.slingshot_ecr.policy_readwrite_arn}"
+  user       = aws_iam_user.deploy.name
+  policy_arn = module.slingshot_ecr.policy_readwrite_arn
 }
 
 resource "aws_iam_user_policy_attachment" "geoblacklight_deploy_ecr" {
-  user       = "${aws_iam_user.deploy.name}"
-  policy_arn = "${module.geoblacklight_ecr.policy_readwrite_arn}"
+  user       = aws_iam_user.deploy.name
+  policy_arn = module.geoblacklight_ecr.policy_readwrite_arn
 }
 
 resource "aws_iam_access_key" "deploy" {
-  user = "${aws_iam_user.deploy.name}"
+  user = aws_iam_user.deploy.name
 }
 
 data "aws_iam_policy_document" "ecs_update" {
@@ -88,13 +88,13 @@ data "aws_iam_policy_document" "ecs_update" {
 }
 
 resource "aws_iam_policy" "ecs_update" {
-  policy      = "${data.aws_iam_policy_document.ecs_update.json}"
+  policy      = data.aws_iam_policy_document.ecs_update.json
   description = "Policy used by deploy user to redeploy service."
 }
 
 resource "aws_iam_user_policy_attachment" "ecs_update" {
-  user       = "${aws_iam_user.deploy.name}"
-  policy_arn = "${aws_iam_policy.ecs_update.arn}"
+  user       = aws_iam_user.deploy.name
+  policy_arn = aws_iam_policy.ecs_update.arn
 }
 
 data "aws_caller_identity" "current" {}
@@ -104,7 +104,7 @@ data "aws_region" "current" {}
 ## Logging ##
 #############
 resource "aws_cloudwatch_log_group" "default" {
-  name              = "${module.label.name}"
-  tags              = "${module.label.tags}"
+  name              = module.label.name
+  tags              = module.label.tags
   retention_in_days = 30
 }

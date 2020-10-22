@@ -1,6 +1,6 @@
 module "label" {
-  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
-  name   = "${var.name}"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
+  name   = var.name
 }
 
 data "aws_ami" "default" {
@@ -19,64 +19,64 @@ data "aws_ami" "default" {
 }
 
 data "template_file" "default" {
-  template = "${file("${path.module}/userdata.tpl")}"
+  template = file("${path.module}/userdata.tpl")
 
   vars = {
-    efs_dns   = "${aws_efs_file_system.default.dns_name}"
-    efs_mount = "${var.mount}"
+    efs_dns   = aws_efs_file_system.default.dns_name
+    efs_mount = var.mount
   }
 }
 
 resource "aws_instance" "default" {
-  instance_type = "${var.instance_type}"
+  instance_type = var.instance_type
 
-  vpc_security_group_ids = ["${var.security_groups}"]
+  vpc_security_group_ids = var.security_groups
 
-  ami                  = "${data.aws_ami.default.id}"
-  key_name             = "${var.key_name}"
-  subnet_id            = "${var.subnet}"
-  tags                 = "${module.label.tags}"
-  user_data            = "${data.template_file.default.rendered}"
-  iam_instance_profile = "${var.instance_profile}"
+  ami                  = data.aws_ami.default.id
+  key_name             = var.key_name
+  subnet_id            = var.subnet
+  tags                 = module.label.tags
+  user_data            = data.template_file.default.rendered
+  iam_instance_profile = var.instance_profile
 
   lifecycle {
     create_before_destroy = true
     ignore_changes = [
-      "ami",
+      ami,
     ]
   }
 }
 
 resource "aws_route53_record" "default" {
-  zone_id = "${var.zone}"
+  zone_id = var.zone
   name    = "${module.label.name}.mitlib.net"
   type    = "CNAME"
   ttl     = "300"
-  records = ["${aws_instance.default.private_dns}"]
+  records = [aws_instance.default.private_dns]
 }
 
 resource "aws_efs_file_system" "default" {
   creation_token = "${module.label.name}-efs"
-  tags           = "${module.label.tags}"
+  tags           = module.label.tags
 }
 
 resource "aws_efs_mount_target" "default" {
-  file_system_id  = "${aws_efs_file_system.default.id}"
-  subnet_id       = "${var.subnet}"
-  security_groups = ["${aws_security_group.default.id}"]
+  file_system_id  = aws_efs_file_system.default.id
+  subnet_id       = var.subnet
+  security_groups = [aws_security_group.default.id]
 }
 
 resource "aws_security_group" "default" {
   name        = "${module.label.name}-efs"
   description = "NFS security group"
-  tags        = "${module.label.tags}"
-  vpc_id      = "${var.vpc}"
+  tags        = module.label.tags
+  vpc_id      = var.vpc
 
   ingress {
     from_port       = 2049
     to_port         = 2049
     protocol        = "tcp"
-    security_groups = ["${var.security_groups}"]
+    security_groups = var.security_groups
   }
 
   egress {
