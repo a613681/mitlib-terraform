@@ -320,30 +320,30 @@ EOF
 
 resource "aws_iam_role_policy" "cost" {
   name   = "cloudcheckr-cost"
-  role   = "${aws_iam_role.cloudcheckr_role.name}"
-  policy = "${data.aws_iam_policy_document.cost.json}"
+  role   = aws_iam_role.cloudcheckr_role.name
+  policy = data.aws_iam_policy_document.cost.json
 }
 
 resource "aws_iam_role_policy" "security" {
   name   = "cloudcheckr-security"
-  role   = "${aws_iam_role.cloudcheckr_role.name}"
-  policy = "${data.aws_iam_policy_document.security.json}"
+  role   = aws_iam_role.cloudcheckr_role.name
+  policy = data.aws_iam_policy_document.security.json
 }
 
 resource "aws_iam_role_policy" "billing" {
   name   = "cloudcheckr-billing"
-  role   = "${aws_iam_role.cloudcheckr_role.name}"
-  policy = "${data.aws_iam_policy_document.billing.json}"
+  role   = aws_iam_role.cloudcheckr_role.name
+  policy = data.aws_iam_policy_document.billing.json
 }
 
 resource "aws_iam_role_policy" "inventory" {
   name   = "cloudcheckr-inventory"
-  role   = "${aws_iam_role.cloudcheckr_role.name}"
-  policy = "${data.aws_iam_policy_document.inventory.json}"
+  role   = aws_iam_role.cloudcheckr_role.name
+  policy = data.aws_iam_policy_document.inventory.json
 }
 
 resource "aws_iam_role_policy" "cloudwatch" {
   name   = "cloudcheckr-cloudwatch"
-  role   = "${aws_iam_role.cloudcheckr_role.name}"
-  policy = "${data.aws_iam_policy_document.cloudwatch.json}"
+  role   = aws_iam_role.cloudcheckr_role.name
+  policy = data.aws_iam_policy_document.cloudwatch.json
 }
