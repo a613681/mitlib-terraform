@@ -53,3 +53,42 @@
     enabled: yes
     daemon_reload: yes
   notify: Restart ZooKeeper
+
+- name: Bounce ZooKeeper service
+  systemd:
+    daemon_reload: yes
+  notify: Restart ZooKeeper
+
+- name: Set mount point
+  set_fact:
+    efs_zookeepers_mount: "{{ lookup('aws_ssm', '{{ app_name }}-{{ terraform_workspace }}-efs-zookeepers-mount', region='us-east-1', decrypt=True) }}"
+  register: result
+- debug: var=result
+
+- name: Set efs dns
+  set_fact:
+    efs_zookeepers_dns: "{{ lookup('aws_ssm', '{{ app_name }}-{{ terraform_workspace }}-efs-zookeepers-dns', region='us-east-1', decrypt=True) }}"
+  register: result
+- debug: var=result
+
+- name: Ensure efs mount directory exists.
+  file:
+    path: "{{ efs_zookeepers_mount }}"
+    state: directory
+    mode: 0755
+  become_user: root
+  become: true
+  register: result
+- debug: var=result
+
+- name: Ensure efs volume is mounted.
+  mount:
+    name: "{{ efs_zookeepers_mount }}"
+    src: "{{ efs_zookeepers_dns }}:/"
+    fstype: nfs4
+    opts: nfsvers=4.1
+    state: mounted
+  become_user: root
+  become: true
+  register: result
+- debug: var=result

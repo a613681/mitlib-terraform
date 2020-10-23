@@ -3,7 +3,7 @@ resource "null_resource" "zk_ansible_playbook" {
     build_number = "${timestamp()}"
   }
   provisioner "local-exec" {
-    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/zookeeper_provision.yaml | tee -a zookeeper_provision.log"
+    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/zookeeper_provision.yaml -e terraform_workspace=${terraform.workspace} -e app_name='rdr' | tee -a zookeeper_provision.log"
   }
   depends_on = [
     aws_route53_record.zookeeper,
@@ -31,7 +31,7 @@ resource "aws_instance" "zookeeper_cluster" {
   subnet_id                   = element(module.shared.private_subnets, 2)
   vpc_security_group_ids      = [aws_security_group.zookeeper_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.get_pubkey_profile.name
-  user_data                   = data.template_file.zk_user_data.rendered
+  user_data                   = data.template_cloudinit_config.zk_config.rendered
   tags = {
     "Name" = "${module.label.name}-zookeeper-${count.index}"
   }
@@ -87,11 +87,23 @@ resource "aws_security_group" "zookeeper_sg" {
   }
 }
 
-data "template_file" "zk_user_data" {
-  template = file("${path.module}/files/user_data.sh")
+data "template_file" "zk_pub_keys" {
+  template = file("${path.module}/files/pub_keys.sh")
   vars = {
     s3_bucket_pubkeys = var.s3_bucket_pubkeys
     s3_bucket_uri     = var.s3_bucket_pubkeys_uri
     ssh_user          = var.ssh_user
+  }
+}
+
+# user_data cloud init scripts
+data "template_cloudinit_config" "zk_config" {
+  gzip          = true
+  base64_encode = true
+  # Main cloud-config configuration file.
+  part {
+    filename     = "pub_keys.sh"
+    content_type = "text/x-shellscript"
+    content      = data.template_file.zk_pub_keys.rendered
   }
 }

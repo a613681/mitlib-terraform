@@ -1,8 +1,40 @@
+
+--- 
+# v# parameter store values of efs created in terraform
+# efs_solrs_dns: "aws ssm get-parameters --names '{{app_name}}-{{terraform_workspace}}-efs-solrs-dns' --with-decryption --region=us-east-1 --output text | cut -f7"
+# efs_solrs_mount: "aws ssm get-parameters --names '{{app_name}}-{{terraform_workspace}}-efs-solrs-mount' --with-decryption --region=us-east-1 --output text | cut -f7"
+
+# this throws python "ERROR! A worker was found in a dead state"
+# efs_solrs_dns: "{{ lookup('aws-param-store', '{{app_name}}-{{terraform_workspace}}-efs-solrs-dns') }}"
+# efs_solrs_mount: "{{ lookup('aws-param-store', '{{app_name}}-{{terraform_workspace}}-efs-solrs-mount') }}"
+
 # Solr
-solr_version: "7.7.2"
-solr_url: "https://archive.apache.org/dist/lucene/solr/{{solr_version}}/solr-{{solr_version}}-src.tgz"
-solr_group: "solr"
-solr_user: "solr"
-solr_install_dir: "/opt/solr"
+dataverse:
+  solr:
+    group: solr
+    root: /opt/solr
+    data: /opt/solr/dvn/data
+    logs: /opt/solr/server/logs
+    user: solr
+    version: 7.7.2
+  jetty:
+    requestHeaderSize: 102400
 
 
+
+
+
+
+
+## notes - to remove after review
+# 1. Set variables here as dataverse repo due to being used during post install (see below)
+# at this point not sure if needed
+# ./tasks/dataverse-postinstall.yml:61:  script: '/tmp/dvinstall/updateSchemaMDB.sh -t {{ dataverse.solr.root }}/server/solr/collection1/conf'
+
+# 2. Will need internal alb for SOLR_LOCATION in terraform
+# ./scripts/installer/interactive.config:22:SOLR_LOCATION = Remote SOLR indexing service
+# ./scripts/installer/interactive.config:41:SOLR_LOCATION = ? \n - Leave this set to "LOCAL" if the SOLR will be running on the same (this) server.\n Otherwise, please enter the host AND THE PORT NUMBER of the remote SOLR service, colon-separated\n (for example: foo.edu:8983)\n:
+
+# 3. This was used below for testing here as variable to test zk_hosts in solr.in.sh.j2 template
+# hosts: "{% for host in groups['solrs'] %}{{host}}{{ '' if loop.last else ',' }}{% endfor %}"
+# zk_hosts: "{% for host in groups['zookeepers'] %}{{host}}:2181{{ '' if loop.last else ',' }}{% endfor %}"

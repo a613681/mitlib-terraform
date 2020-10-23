@@ -1,25 +1,24 @@
-## DATAVERSE
+# DATAVERSE
 
 This folder contains the setup and configuration of MIT Dataverse installation of [Harvard Dataverse](https://dataverse.harvard.edu/)
 
+## Infrasturucture created with terraform and configured with ansible
 
-
-
-#### What's created?:
-* Dataverse Application ec2 1 node behind load balancer in public subnet
-* SolrCloud 2 nodes - private subnet
-* Zookeeper 3 nodes - private subnet
-* RDS (postgress) - private subnet
-
-
-
-#### Additional notes:
-*
+* Dataverse Application - in public subnet, ELB healthcheck 
+* Zookeeper 3 nodes - private subnet to be build and configured first
+* SolrCloud 2 nodes - private subnet, ELB healthcheck
+* RDS - private subnet
 
 ## Outputs
+
 | Name | Description |
 |------|-------------|
-| deploy\_user | Name of the IAM deploy user |
+| app-public-fqdn | <app_name>\-<terraform.workspace>\.<domain\> |
+| app-private-fqdn | <app_name>\-<terraform.workspace>\.<domain\> |
+| zookeeper-private-fqdn |<zookeeper_name\>\-<terraform.workspace>\-\<count>\.<domain\> |
+| solr-private-fqdn  | \<solr\>\-<terraform.workspace>\-<count\>\.<domain\> |
+| rds-private-fqdn | <app_name>\-<terraform.workspace>\.<domain\> |
+| efs-mount-target-solr-fqdn| <app_name>\-<terraform.workspace>\-<count\>\.<domain\> |  
+| efs-mount-target-zookeeper-fqdn| <app_name>\-<terraform.workspace>\-<count\>\.<domain\>|
 
-
-## commands
+## Application setup and deployment notes

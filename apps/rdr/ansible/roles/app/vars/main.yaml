@@ -1,0 +1,8 @@
+dataverse:
+  payara:
+    group: dataverse
+    root: /opt/payara5
+    user: dataverse
+    version: 5.2020.2
+    launch_timeout: 180
+    request_timeout: 1800

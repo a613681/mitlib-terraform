@@ -1,5 +1,5 @@
 - hosts: solrs
-  gather_facts: False
+  gather_facts: True
   become: true
   become_user: root
   roles:

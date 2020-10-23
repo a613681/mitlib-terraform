@@ -7,3 +7,6 @@
       - java-1.8.0-openjdk
       - curl
       - nc
+      - lynx
+      - unzip
+      - nfs-utils
