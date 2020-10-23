@@ -1,5 +1,5 @@
 module "label" {
-  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
   name   = "ebooks"
 }
 
@@ -11,19 +11,19 @@ resource "aws_iam_user" "default" {
 }
 
 module "ebooks" {
-  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
+  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.12"
   name               = "ebooks"
   versioning_enabled = "true"
 }
 
 resource "aws_iam_user_policy_attachment" "default_ro" {
-  user       = "${aws_iam_user.default.name}"
-  policy_arn = "${module.ebooks.readonly_arn}"
+  user       = aws_iam_user.default.name
+  policy_arn = module.ebooks.readonly_arn
 }
 
 # Generate API credentials
 resource "aws_iam_access_key" "default" {
-  user = "${aws_iam_user.default.name}"
+  user = aws_iam_user.default.name
 }
 
 # Create a role with admin access for managing ebooks in S3 bucket
@@ -55,6 +55,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "admin" {
-  role       = "${aws_iam_role.cataloger.name}"
-  policy_arn = "${module.ebooks.admin_arn}"
+  role       = aws_iam_role.cataloger.name
+  policy_arn = module.ebooks.admin_arn
 }
