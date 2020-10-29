@@ -97,3 +97,23 @@ resource "aws_ecs_task_definition" "oaiharvester" {
   cpu                      = 256
   memory                   = 512
 }
+
+resource "aws_ecs_task_definition" "hoard" {
+  family = "${module.label.name}-hoard"
+  tags   = module.label.tags
+  container_definitions = templatefile(
+    "${path.module}/tasks/hoard.json",
+    {
+      "name"       = "${module.label.name}-hoard"
+      "image"      = module.hoard_ecr.registry_url
+      "log_group"  = aws_cloudwatch_log_group.default.name
+      "log_prefix" = "hoard-task"
+      "rdr_key"    = aws_ssm_parameter.rdr_key.arn
+  })
+  requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.airflow.arn
+  task_role_arn            = aws_iam_role.workflow_task.arn
+  network_mode             = "awsvpc"
+  cpu                      = 256
+  memory                   = 512
+}

@@ -24,6 +24,17 @@ resource "aws_iam_user_policy_attachment" "oaiharvester_deploy_ecr" {
   policy_arn = module.oaiharvester_ecr.policy_readwrite_arn
 }
 
+resource "aws_iam_user_policy_attachment" "hoard_deploy_ecr" {
+  user       = aws_iam_user.deploy.name
+  policy_arn = module.hoard_ecr.policy_readwrite_arn
+}
+
+# Used by hoard to get the Oracle libs
+resource "aws_iam_user_policy_attachment" "deploy_s3" {
+  user       = aws_iam_user.deploy.name
+  policy_arn = module.shared.deploy_rw_arn
+}
+
 resource "aws_iam_policy" "airflow_deploy_ecs" {
   policy = data.aws_iam_policy_document.airflow_deploy_ecs.json
 }
