@@ -1,5 +1,5 @@
 module "label" {
-  source = "github.com/mitlibraries/tf-mod-name?ref=0.11"
+  source = "github.com/mitlibraries/tf-mod-name?ref=0.12"
   name   = "ezproxy-lookup"
 }
 
@@ -11,19 +11,19 @@ resource "aws_iam_user" "default" {
 }
 
 module "ezproxy-lookup" {
-  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.11"
+  source             = "github.com/mitlibraries/tf-mod-s3-iam?ref=0.12"
   name               = "ezproxy-lookup"
   versioning_enabled = "true"
 }
 
 resource "aws_iam_user_policy_attachment" "default_ro" {
-  user       = "${aws_iam_user.default.name}"
-  policy_arn = "${module.ezproxy-lookup.readonly_arn}"
+  user       = aws_iam_user.default.name
+  policy_arn = module.ezproxy-lookup.readonly_arn
 }
 
 # Generate API credentials
 resource "aws_iam_access_key" "default" {
-  user = "${aws_iam_user.default.name}"
+  user = aws_iam_user.default.name
 }
 
 # Create a role with admin access for managing ezproxy lookup S3 bucket
@@ -55,6 +55,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "admin" {
-  role       = "${aws_iam_role.ezproxy-lookup.name}"
-  policy_arn = "${module.ezproxy-lookup.admin_arn}"
+  role       = aws_iam_role.ezproxy-lookup.name
+  policy_arn = module.ezproxy-lookup.admin_arn
 }
