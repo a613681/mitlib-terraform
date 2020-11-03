@@ -13,13 +13,18 @@ This folder contains the configuration for deploying our version of the [Cantalo
 
 #### Additional notes:
 * We are currently using the OpenJpeg Processor while we sort out Kakadu licensing
-* The `stage` environment is restricted to MIT access only (18.0.0.0/9)
+* The `stage` environment is restricted to MIT access only
 * Admin web GUI is disabled in the `prod` environment
 
-## Outputs
+## Input Variables
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| admin_pass | Admin password for web GUI management. | string | n/a | yes |
+| endpoint_admin_enabled | Enable or disable Cantaloupe's admin endpoint. | string | n/a | yes |
 
+## Outputs
 | Name | Description |
 |------|-------------|
-| access\_key\_id | Access key for deploy user |
-| deploy\_user | Name of the IAM deploy user |
-| secret\_access\_key | Secret key for deploy user |
+| access\_key\_id | Access key for deploy user. |
+| deploy\_user | Name of the IAM deploy user. |
+| secret\_access\_key | Secret key for deploy user. |

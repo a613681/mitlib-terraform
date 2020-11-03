@@ -1,19 +1,19 @@
 resource "aws_iam_role" "default" {
-  name               = "${module.label.name}"
-  tags               = "${module.label.tags}"
+  name               = module.label.name
+  tags               = module.label.tags
   description        = "Cantaloupe task execution role"
-  assume_role_policy = "${data.aws_iam_policy_document.default.json}"
+  assume_role_policy = data.aws_iam_policy_document.default.json
 }
 
 resource "aws_iam_role_policy_attachment" "default" {
-  role       = "${aws_iam_role.default.name}"
-  policy_arn = "${data.aws_iam_policy.default.arn}"
+  role       = aws_iam_role.default.name
+  policy_arn = data.aws_iam_policy.default.arn
 }
 
 resource "aws_iam_role_policy" "ssm" {
   name   = "${module.label.name}-ssm"
-  role   = "${aws_iam_role.default.name}"
-  policy = "${data.aws_iam_policy_document.ssm.json}"
+  role   = aws_iam_role.default.name
+  policy = data.aws_iam_policy_document.ssm.json
 }
 
 data "aws_iam_policy_document" "default" {
@@ -46,21 +46,21 @@ data "aws_iam_policy_document" "ssm" {
 ####### Deploy user #######
 resource "aws_iam_user" "deploy" {
   name = "${module.label.name}-deploy"
-  tags = "${module.label.tags}"
+  tags = module.label.tags
 }
 
 resource "aws_iam_user_policy_attachment" "ecr" {
-  user       = "${aws_iam_user.deploy.name}"
-  policy_arn = "${module.ecr.policy_readwrite_arn}"
+  user       = aws_iam_user.deploy.name
+  policy_arn = module.ecr.policy_readwrite_arn
 }
 
 resource "aws_iam_user_policy_attachment" "deploy" {
-  user       = "${aws_iam_user.deploy.name}"
-  policy_arn = "${aws_iam_policy.deploy.arn}"
+  user       = aws_iam_user.deploy.name
+  policy_arn = aws_iam_policy.deploy.arn
 }
 
 resource "aws_iam_policy" "deploy" {
-  policy = "${data.aws_iam_policy_document.deploy.json}"
+  policy = data.aws_iam_policy_document.deploy.json
 }
 
 data "aws_iam_policy_document" "deploy" {

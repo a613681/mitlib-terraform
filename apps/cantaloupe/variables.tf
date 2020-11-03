@@ -1,9 +1,9 @@
 variable endpoint_admin_enabled {
-  type        = "string"
-  description = "Enable or disable Cantaloupe's Admin endpoint"
+  type        = string
+  description = "Enable or disable Cantaloupe's admin endpoint."
 }
 
 variable admin_pass {
-  type        = "string"
-  description = "Admin Password for web GUI management"
+  type        = string
+  description = "Admin password for web GUI management."
 }
