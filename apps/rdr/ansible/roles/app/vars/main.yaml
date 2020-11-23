@@ -38,7 +38,9 @@ dataverse:
     label: file
     path: /opt/dvn/data
 # Filedirs for stage and prod will point to s3 sftp 
-
+solr:
+  host: solr_host
+  
 rserve:
   host: localhost
   user: rserve

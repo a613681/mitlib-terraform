@@ -20,7 +20,7 @@ POSTGRES_ADMIN_PASSWORD = {{ db.postgres.adminpass }}
 [system]
 ADMIN_EMAIL = {{ dataverse.service_email }}
 MAIL_SERVER = {{ dataverse.smtp }}
-SOLR_LOCATION = LOCAL
+SOLR_LOCATION = {{ solr_host }}
 TWORAVENS_LOCATION = NOT_INSTALLED
 
 [rserve]
