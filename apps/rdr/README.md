@@ -18,7 +18,7 @@ This folder contains the setup and configuration of MIT Dataverse installation o
 | zookeeper-private-fqdn |<zookeeper_name\>\-<terraform.workspace>\-\<count>\.<domain\> |
 | solr-private-fqdn  | \<solr\>\-<terraform.workspace>\-<count\>\.<domain\> |
 | rds-private-fqdn | <app_name>\-<terraform.workspace>\.<domain\> |
-| efs-mount-target-solr-fqdn| <app_name>\-<terraform.workspace>\-<count\>\.<domain\> |  
-| efs-mount-target-zookeeper-fqdn| <app_name>\-<terraform.workspace>\-<count\>\.<domain\>|
+| efs-mount-target-solr-fqdn| <app_name>\-<terraform.workspace>\.<domain\> |  
+| efs-mount-target-zookeeper-fqdn| <app_name>\-<terraform.workspace>\.<domain\>|
 
 ## Application setup and deployment notes

@@ -1,14 +1,14 @@
-# resource "null_resource" "app_ansible_playbook" {
-#   triggers = {
-#     build_number = "${timestamp()}"
-#   }
-#   provisioner "local-exec" {
-#     command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/app_provision.yaml | tee -a app_provision.log"
-#   }
-#   depends_on = [
-#     aws_route53_record.app,
-#   ]
-# }
+resource "null_resource" "app_ansible_playbook" {
+  triggers = {
+    build_number = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    command = "ansible-playbook -i ansible/inventories/${terraform.workspace} ansible/app_provision.yaml | tee -a app_provision.log"
+  }
+  depends_on = [
+    aws_route53_record.app,
+  ]
+}
 
 resource "aws_route53_record" "app" {
   zone_id = module.shared.public_zoneid
@@ -60,7 +60,7 @@ resource "aws_lb_target_group_attachment" "app_default" {
 
 resource "aws_route53_record" "app_priv" {
   zone_id = module.shared.private_zoneid
-  name    = "${module.label.name}-app-priv"
+  name    = "${module.label.name}-app"
   type    = "CNAME"
   ttl     = "300"
   records = aws_instance.app.*.private_dns

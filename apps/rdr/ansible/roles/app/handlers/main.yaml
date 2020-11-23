@@ -2,3 +2,13 @@
   systemd:
     name: payara
     state: restarted
+
+- name: Restart Rserve
+  systemd:
+    name: rserve
+    state: restarted
+
+- name: Restart Postfix
+  systemd:
+    name: postfix
+    state: restarted

@@ -1,14 +1,21 @@
 ---
 
-- name: Download dvinstall
-  unarchive:
-    src: "https://github.com/IQSS/dataverse/releases/download/v5.0/dvinstall.zip"
-    dest: /tmp
-    remote_src: yes
-
-# Payara
 - group: name={{ dataverse.payara.group }} system=yes
 - user: name={{ dataverse.payara.user }} group={{ dataverse.payara.group }} system=yes
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ dataverse.payara.user }}"
+    group: "{{ dataverse.payara.group }}"
+    mode: '0755'
+  with_items:
+    - "{{ dataverse.payara.root }}"
+    - "{{ dataverse.filesdirs.path }}"
+    - "{{ dataverse.target }}"
+
+# Install Dataverse prerequisites
 
 - name: Download and extract payara
   unarchive:
@@ -36,3 +43,227 @@
   systemd:
     daemon_reload: yes
   notify: Restart Payara
+
+- name: Install packages
+  yum: name={{ packages }} state=present
+  vars:
+    packages:
+      - python-psycopg2
+      - ImageMagick
+      - postfix
+
+- name: Install packages
+  yum: name={{ packages }} state=present
+  vars:
+    packages:
+      - amazon-linux-extras
+
+- name: Install epel 
+  shell: |
+    amazon-linux-extras install epel -y
+    amazon-linux-extras install postgresql11 -y
+
+- name: Install packages
+  yum: name={{ packages }} state=present
+  vars:
+    packages:
+      - python3
+
+- name: Install specified python requirements 
+  shell: |
+    pip3 install psycopg2-binary
+
+- name: Install packages
+  yum: name={{ packages }} state=present
+  vars:
+    packages:
+      - R-core
+      - R-core-devel
+
+- name: Installing the required R libraries
+  command: >-
+    Rscript --slave --no-save --no-restore-history -e "
+    if (! ('{{ item }}' %in% installed.packages()[,'Package'])) {
+      install.packages(pkgs='{{ item }}', repos=c('https://ftp.osuosl.org/pub/cran/'));
+      print('Added');
+    } else {
+      print('Already installed');
+    }"
+  register: r_result
+  failed_when: "r_result.rc != 0 or 'had non-zero exit status' in r_result.stderr"
+  changed_when: "'Added' in r_result.stdout"
+  with_items:
+    - R2HTML
+    - rjson
+    - DescTools
+    - Rserve
+    - haven
+
+- name: create R user and group
+  user:
+    name: '{{ rserve.user }}'
+
+- name: Configure Rserv.conf
+  template:
+    src: Rserv.conf.j2
+    dest: /etc/rserv.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: install Rserv.pwd
+  template:
+    src: Rserv.pwd.j2
+    dest: /etc/rserv.pwd
+    owner: '{{ rserve.user }}'
+    group: '{{ rserve.group }}'
+    mode: '0600'
+
+- name: Create rserve service
+  template:
+    src: rserve.service.j2
+    dest: "/etc/systemd/system/rserve.service"
+    mode: '0644'
+
+- name: Enable and Bounce rserve service
+  systemd:
+    name: rserve.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  notify: Restart Rserve
+
+- name: Enable and Bounce postfix service
+  systemd:
+    name: postfix.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  notify: Restart Postfix
+
+- name: Setup Postfix sasl
+  shell: |
+    echo '["{{postfix.smtp_host}}"]:"{{postfix.smtp_port}}" "{{postfix.smtp_user}}":"{{postfix.smtp_password}}"'>/etc/postfix/sasl_passwd
+    postmap hash:/etc/postfix/sasl_passwd
+    chown root:root /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
+    chmod 0600 /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
+  become_user: root
+  become: true
+
+- name: Setup Postfix
+  shell: |
+    postconf -e "relayhost = [{{ postfix.smtp_host }}]:{{ postfix.smtp_port }}" \
+    "smtp_sasl_auth_enable = yes" \
+    "smtp_sasl_security_options = noanonymous" \
+    "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd" \
+    "smtp_use_tls = yes" \
+    "smtp_tls_security_level = encrypt" \
+    "smtp_tls_note_starttls_offer = yes" \
+    "myhostname =  {{cname}}" \
+    "myorigin = {{postfix.myorigin}}" \
+    "mydestination = {{postfix.mydestination}}"
+  become_user: root
+  become: true
+
+- name: Bounce Postfix service
+  systemd:
+    daemon_reload: yes
+  notify: Restart Postfix
+
+
+## Install dataverse
+- name: Run dataverse installer
+  debug:
+    msg: 'Run dataverse installer'
+
+- name: Download dvinstall
+  unarchive:
+    src: "{{ install_src }}"
+    dest: "{{ dataverse.srcdir }}"
+    owner: "{{ dataverse.payara.user }}"
+    group: "{{ dataverse.payara.user }}"
+    remote_src: yes
+
+- name: fix perms on dataverse-war
+  file: 
+    path: "{{ dataverse.srcdir }}/dvinstall/dataverse.war" 
+    mode: 0644
+
+- name: set dataverse adminpass in setup-all
+  lineinfile:
+    path: "{{ dataverse.srcdir }}/dvinstall/setup-all.sh"
+    regexp: '^DV_SU_PASSWORD'
+    line: 'DV_SU_PASSWORD="{{ dataverse.adminpass }}"'
+
+- name: bash aliases won't expand in non-interactive shells
+  lineinfile:
+    path: "{{ dataverse.srcdir }}/dvinstall/as-setup.sh"
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - { regexp: 'rserve_password_alias', line: '  ./asadmin $ASADMIN_OPTS create-jvm-options "\-Ddataverse.rserve.password=${RSERVE_PASS}"' }
+    - { regexp: 'doi_password_alias', line: '  ./asadmin $ASADMIN_OPTS create-jvm-options "\-Ddoi.password=${DOI_PASSWORD}"' }
+    - { regexp: 'db_password_alias', line: '  ./asadmin $ASADMIN_OPTS set "resources.jdbc-connection-pool.dvnDbPool.property.password=${DB_PASS}"' }
+
+- name: ensure as-setup.sh is executable
+  file:
+    path: "{{ dataverse.srcdir }}/dvinstall/as-setup.sh"
+    mode: 0755
+
+- name: place default.config template
+  template:
+    src: default.config.j2
+    dest: "{{ dataverse.srcdir }}/dvinstall/default.config"
+    owner: '{{ dataverse.payara.user }}'
+    group: '{{ dataverse.payara.group }}'
+    mode: 0600
+
+- name: patch installAppServer.py so that FILES_DIR points to the correct location
+  lineinfile:
+    path: "{{ dataverse.srcdir }}/dvinstall/installAppServer.py"
+    regexp: "^   os.environ..FILES_DIR.. = "
+    line: "   os.environ['FILES_DIR'] = \"{{ dataverse.filesdirs[0].path }}\""
+
+- name: patch as-setup.sh so it doesn't hardcode siteUrl
+  lineinfile:
+    path: "{{ dataverse.srcdir }}/dvinstall/as-setup.sh"
+    regexp: '(.*)-Ddataverse.siteUrl(.*)'
+    line: '  ./asadmin $ASADMIN_OPTS create-jvm-options "\-Ddataverse.siteUrl={{ dataverse.payara.siteUrl }}"'
+
+- name: allow installer write access
+  file:
+    path: "{{ dataverse.srcdir }}/dvinstall"
+    owner: '{{ dataverse.payara.user }}'
+
+# Python installer fails on the first run on line 554 of the installer.py. There is a "@todo:" in the script that in the future might fix this issue. 
+# Added ignore fail for the first runbecause after stopping glasfish and runnning the isntaller a second time the installer doesn't fail!
+
+- name: Fire off python installer
+  shell: '/usr/bin/python "{{ dataverse.srcdir }}/dvinstall/install.py" -f --config_file=default.config --noninteractive >> "{{ dataverse.srcdir }}/dvinstall/install.out" 2>&1'
+  become: yes
+  become_user: '{{ dataverse.payara.user }}'
+  args:
+    chdir: "{{ dataverse.srcdir }}/dvinstall"
+  # ignore_errors: yes
+
+- name: Enable and Bounce payara service
+  systemd:
+    name: payara.service
+    state: stopped
+
+- name: Fire off installer
+  shell: '/usr/bin/python3 "{{ dataverse.srcdir }}/dvinstall/install.py" -f --config_file=default.config --noninteractive >> "{{ dataverse.srcdir }}/dvinstall/install.out" 2>&1'
+  become: yes
+  become_user: '{{ dataverse.payara.user }}'
+  args:
+    chdir: "{{ dataverse.srcdir }}/dvinstall"
+
+- name: Bounce payara service
+  systemd:
+    daemon_reload: yes
+  notify: Restart Payara
+
+- name: Bounce rserve service
+  systemd:
+    daemon_reload: yes
+  notify: Restart Rserve
