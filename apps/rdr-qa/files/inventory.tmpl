@@ -1,0 +1,10 @@
+[app]
+%{ for fqdn in app ~}
+${fqdn}
+%{ endfor ~}
+
+
+
+
+[stage:children]
+app

@@ -1,0 +1,37 @@
+[glassfish]
+HOST_DNS_ADDRESS = {% for host in groups['app'] %}{{host}}{% endfor %}
+
+GLASSFISH_USER = {{ dataverse.payara.user }}
+GLASSFISH_DIRECTORY = {{ dataverse.payara.dir }}
+GLASSFISH_ADMIN_USER = {{ dataverse.payara.adminuser }}
+GLASSFISH_ADMIN_PASSWORD = {{ dataverse.payara.adminpass }}
+GLASSFISH_HEAP = {{ dataverse.memheap }}
+GLASSFISH_REQUEST_TIMEOUT = {{ dataverse.payara.request_timeout }}
+
+[database]
+POSTGRES_ONLY = false
+POSTGRES_SERVER	= {{ db.postgres.host }}
+POSTGRES_PORT = {{ db.postgres.port }}
+POSTGRES_DATABASE = {{ db.postgres.name }}
+POSTGRES_USER = {{ db.postgres.user }}
+POSTGRES_PASSWORD = {{ db.postgres.pass }}
+POSTGRES_ADMIN_PASSWORD = {{ db.postgres.adminpass }}
+
+[system]
+ADMIN_EMAIL = {{ dataverse.service_email }}
+MAIL_SERVER = {{ dataverse.smtp }}
+SOLR_LOCATION = LOCAL
+TWORAVENS_LOCATION = NOT_INSTALLED
+
+[rserve]
+RSERVE_HOST = {{ rserve.host }}
+RSERVE_PORT = {{ rserve.port }}
+RSERVE_USER = {{ rserve.user }}
+RSERVE_PASSWORD = {{ rserve.pass }}
+
+[doi]
+DOI_USERNAME = {{ dataverse.doi.username }}
+DOI_PASSWORD = {{ dataverse.doi.password }}
+DOI_BASEURL = {{ dataverse.doi.baseurl }}
+DOI_MDCBASEURL = {{ dataverse.doi.mdcbaseurl }}
+DOI_DATACITERESTAPIURL = {{ dataverse.doi.dataciterestapiurl }}

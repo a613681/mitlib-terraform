@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ASADMIN={{ dataverse.payara.dir }}/bin/asadmin
+
+# undeploy
+CURRENT=`$ASADMIN list-applications -t | awk '{print $1}'`
+$ASADMIN undeploy $CURRENT
+sleep 3
+
+# deploy
+chmod 644 {{dataverse.target}}/dataverse*.war
+$ASADMIN deploy --force=true {{dataverse.target}}/dataverse*.war
+sleep 3
+
+# restart
+$ASADMIN stop-domain
+sleep 3
+$ASADMIN start-domain
+

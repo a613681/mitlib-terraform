@@ -1,0 +1,8 @@
+- hosts: app
+  gather_facts: True
+  become: true
+  become_user: root
+  roles:
+    - solr
+    - app
+  

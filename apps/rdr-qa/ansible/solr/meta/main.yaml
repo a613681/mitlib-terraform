@@ -1,0 +1,5 @@
+dependencies:
+  - role: common
+
+# Keeping common role same way as it was for rdr stack where the role will need to run on app & solr instances
+# could take out from here and run common role at app_provision.yaml

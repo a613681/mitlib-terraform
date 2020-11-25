@@ -1,0 +1,76 @@
+dataverse:
+  adminpass: admin1
+  allow_signups: true
+  api:
+    allow_lookup: false
+    blocked_endpoints: "admin,test"
+    blocked_policy: "localhost-only"
+    location: "http://localhost:8080/api"
+    test_suite: false
+    tests: all
+  doi:
+    authority: "10.5072"
+    baseurl: "https://mds.test.datacite.org/"
+    dataciterestapiurl: "https://api.test.datacite.org"
+    mdcbaseurl: "https://api.test.datacite.org/"
+    username: "testaccount"
+    password: "notmypassword"
+    protocol: doi
+    provider: FAKE
+    shoulder: "FK2/"
+  payara:
+    version: 5.2020.2
+    group: dataverse
+    user: dataverse
+    root: /opt
+    dir: /opt/payara5
+    launch_timeout: 180
+    request_timeout: 1800
+    adminuser: admin
+    adminpass: notPr0d
+    siteUrl: 
+  service_email: noreply@outgoing.mit.edu
+  smtp: localhost:25 # or the FQDN of your organization's SMTP relay
+  memheap: 2048
+  
+  filesdirs:
+  - label: file
+    path: /opt/dvn/data
+  srcdir: /opt
+  target: /opt/dvinstall/target
+
+rserve:
+  host: localhost
+  user: rserve
+  group: rserve
+  pass: rserve
+  port: 6311
+  workdir: /tmp/Rserv
+
+db:
+  postgres:
+    adminpass: DVn33dsth1s
+    name: dvndb
+    host: localhost
+    user: dvnuser
+    pass: dvnsecret
+    jdbcurl: 
+    version: 11
+    port: 5432
+#   log_lock_waits: true
+
+postfix:
+  smtp_host: "outgoing.mit.edu"
+  smtp_user: "smtp_user"
+  smtp_password: "smtp_password"
+  smtp_port: 543
+  myorigin: "mit.edu"
+  mydestination: "$myhostname, localhost.$mydomain, localhost, {{ cname }}, {{ ansible_host }}"
+cname: "rdr-qa-stage-app.mit.edu"
+
+install_src_version: "v5.0"
+install_src: "https://github.com/IQSS/dataverse/releases/download/{{install_src_version}}/dvinstall.zip"
+
+redeploy: true
+redeploy_src_version: "v5.0"
+redeploy_src: "https://github.com/MITLibraries/dataverse/releases/download/{{redeploy_src_version}}/dvinstall.zip"

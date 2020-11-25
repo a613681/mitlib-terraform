@@ -1,0 +1,16 @@
+[Unit]
+Description = Payara Server
+After = syslog.target network.target
+
+[Service]
+Type = forking
+User={{ dataverse.payara.user }}
+ExecStart = /usr/bin/java -jar {{ dataverse.payara.dir }}/glassfish/lib/client/appserver-cli.jar start-domain
+ExecStop = /usr/bin/java -jar {{ dataverse.payara.dir }}/glassfish/lib/client/appserver-cli.jar stop-domain
+ExecReload = /usr/bin/java -jar {{ dataverse.payara.dir }}/glassfish/lib/client/appserver-cli.jar restart-domain
+LimitNOFILE=65000
+TimeoutStartSec={{ dataverse.payara.launch_timeout }}
+Restart=on-failure
+
+[Install]
+WantedBy = multi-user.target

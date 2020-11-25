@@ -1,0 +1,20 @@
+- name: Restart Payara
+  systemd:
+    name: payara
+    state: restarted
+
+- name: Restart Postgresql
+  systemd:
+    name: postgresql
+    state: restarted
+
+- name: Restart Rserve
+  systemd:
+    name: rserve
+    state: restarted
+
+- name: Restart Postfix
+  systemd:
+    name: postfix
+    state: restarted
+
