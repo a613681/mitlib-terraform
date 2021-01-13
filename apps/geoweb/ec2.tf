@@ -109,7 +109,7 @@ module "geoserver" {
   subnet           = module.shared.private_subnets[0]
   mount            = "/mnt/geoserver"
   security_groups  = [aws_security_group.geoserver.id]
-  key_name         = "mit-mgraves"
+  key_name         = "vab-aws"
   zone             = module.shared.private_zoneid
   instance_profile = aws_iam_instance_profile.geoserver.name
   instance_type    = var.instance_type

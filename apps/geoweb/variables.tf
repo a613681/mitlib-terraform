@@ -101,7 +101,7 @@ variable rails_auth_type {
 variable idp_metadata_url {
   type        = string
   description = "IDP_METADATA_URL envvar for SAML auth"
-  default     = "https://touchstone.mit.edu/metadata/MIT-metadata.xml"
+  default     = "https://touchstone.mit.edu/metadata/idp.mit.edu-metadata.xml"
 }
 
 variable idp_entity_id {
